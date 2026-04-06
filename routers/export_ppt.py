@@ -4,13 +4,14 @@ from fastapi.responses import StreamingResponse
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from schemas.line_break import LineBreakRequest
-from utils.text_processing import apply_line_break
+from utils.text_processing import apply_line_break, inspect_line_breaks
 
 router = APIRouter(prefix="/line-break/export_ppt", tags=["export"])
 
 @router.post('')
 def export_ppt(request: LineBreakRequest):
     text = apply_line_break(request.text)
+    text, _, _ = inspect_line_breaks(text)
     blocks = [b.strip() for b in text.split('\n\n') if b.strip()]
     if not blocks:
         blocks = [text.strip()]

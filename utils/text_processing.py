@@ -1,6 +1,12 @@
 import re
 
+def inspect_line_breaks(text: str) -> tuple[str, bool, list[str]]:
+    normalized = text.replace('\r\n', '\n').replace('\r', '\n')
+    has_line_breaks = '\n' in normalized
+    return normalized, has_line_breaks, normalized.splitlines()
+
 def normalize(text: str) -> str:
+    text, _, _ = inspect_line_breaks(text)
     # Upgrade lone \n before verse ref to \n\n; preserve \n\n and \n\n\n
     return re.sub(r'(?<!\n)\n(?!\n)([가-힣]+\d+:\d)', r'\n\n\1', text)
 
