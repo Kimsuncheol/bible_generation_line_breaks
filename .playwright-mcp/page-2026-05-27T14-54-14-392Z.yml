@@ -1,0 +1,46 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - heading "Line Break Test Client" [level=1] [ref=e4]
+    - paragraph [ref=e5]: Generate Korean Bible text from multiple references, move the result into the line-break workflow, then process and export it.
+  - navigation "Client Tools" [ref=e6]:
+    - button "line break" [ref=e7] [cursor=pointer]
+    - button "bible lookup" [ref=e8] [cursor=pointer]
+  - generic [ref=e9]:
+    - generic [ref=e11]:
+      - heading "Line Break Tools" [level=2] [ref=e12]
+      - paragraph [ref=e13]:
+        - text: Calls
+        - code [ref=e14]: /line-break
+        - text: ","
+        - code [ref=e15]: /line-break/export_docx
+        - text: ","
+        - code [ref=e16]: /line-break/export_ppt
+        - text: ", and"
+        - code [ref=e17]: /line-break/export_xlsx
+        - text: .
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - generic [ref=e21]: Input Text
+          - generic [ref=e22]: 0 chars
+        - generic [ref=e23]:
+          - textbox "창1:1 태초에 하나님이 천지를 창조하시니라 창1:2 땅이 혼돈하고 공허하며" [ref=e24]:
+            - /placeholder: "창1:1 태초에 하나님이 천지를 창조하시니라\n\n창1:2 땅이 혼돈하고 공허하며"
+          - button "Clear input text" [ref=e26] [cursor=pointer]:
+            - img [ref=e27]
+        - generic [ref=e30]:
+          - button "Process Text" [ref=e31] [cursor=pointer]
+          - button "Download DOCX" [ref=e32] [cursor=pointer]
+          - button "Download PPTX" [ref=e33] [cursor=pointer]
+          - button "Download XLSX" [ref=e34] [cursor=pointer]
+        - generic [ref=e35]: Ready.
+        - paragraph [ref=e36]: Paste any source text here and run the existing line-break and export endpoints.
+      - generic [ref=e37]:
+        - generic [ref=e38]:
+          - generic [ref=e39]: Processed Output
+          - generic [ref=e40]: 0 lines
+        - generic [ref=e41]:
+          - generic [ref=e42]: Processed text will appear here.
+          - button "Copy processed output" [ref=e44] [cursor=pointer]:
+            - img [ref=e45]
+  - text: Generated Bible text will appear here.

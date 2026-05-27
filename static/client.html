@@ -206,8 +206,9 @@
       padding: 54px 58px 18px 20px;
     }
 
-    .field-shell.has-copy pre {
-      padding-right: 98px;
+    .field-shell pre:empty::before {
+      content: attr(data-placeholder);
+      color: var(--muted);
     }
 
     .lookup-output {
@@ -220,6 +221,11 @@
       right: 10px;
       display: flex;
       gap: 6px;
+    }
+
+    .field-actions[hidden],
+    .field-icon-button[hidden] {
+      display: none;
     }
 
     .field-icon-button {
@@ -366,7 +372,7 @@
           </div>
           <div class="field-shell">
             <textarea id="sourceText" spellcheck="false" placeholder="창1:1 태초에 하나님이 천지를 창조하시니라&#10;&#10;창1:2 땅이 혼돈하고 공허하며"></textarea>
-            <div class="field-actions">
+            <div class="field-actions" id="sourceActions" hidden>
               <button class="field-icon-button eraser-button" id="eraseSourceBtn" type="button" aria-label="Clear input text" title="Clear input text">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="m7 21-4-4L14 6l4 4L7 21Z"></path>
@@ -396,8 +402,8 @@
             <span id="outputMeta">0 lines</span>
           </div>
           <div class="field-shell has-copy">
-            <pre id="resultText">Processed text will appear here.</pre>
-            <div class="field-actions">
+            <pre id="resultText" data-placeholder="Processed text will appear here."></pre>
+            <div class="field-actions" id="resultActions" hidden>
               <button class="field-icon-button copy-output-button" id="copyResultBtn" type="button" aria-label="Copy processed output" title="Copy processed output">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -425,7 +431,7 @@
               <label class="field-label" for="lookupInput">Input References</label>
               <div class="field-shell">
                 <textarea id="lookupInput" spellcheck="false" placeholder="마25:21&#10;마25:29&#10;사43:7&#10;계2:8-13&#10;고전15:58&#10;고전15:10"></textarea>
-                <div class="field-actions">
+                <div class="field-actions" id="lookupInputActions" hidden>
                   <button class="field-icon-button eraser-button" id="eraseLookupInputBtn" type="button" aria-label="Clear input references" title="Clear input references">
                     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="m7 21-4-4L14 6l4 4L7 21Z"></path>
@@ -453,8 +459,8 @@
             <span id="lookupMeta">0 lines</span>
           </div>
           <div class="field-shell has-copy">
-            <pre id="lookupResult" class="lookup-output">Generated Bible text will appear here.</pre>
-            <div class="field-actions">
+            <pre id="lookupResult" class="lookup-output" data-placeholder="Generated Bible text will appear here."></pre>
+            <div class="field-actions" id="lookupResultActions" hidden>
               <button class="field-icon-button copy-output-button" id="copyLookupBtn" type="button" aria-label="Copy generated output" title="Copy generated output">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -471,9 +477,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    const processedPlaceholder = "Processed text will appear here.";
-    const generatedPlaceholder = "Generated Bible text will appear here.";
-
     const tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
     const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
 
@@ -492,6 +495,11 @@
     const copyLookupBtn = document.getElementById("copyLookupBtn");
     const eraseSourceBtn = document.getElementById("eraseSourceBtn");
     const eraseLookupInputBtn = document.getElementById("eraseLookupInputBtn");
+
+    const sourceActions = document.getElementById("sourceActions");
+    const resultActions = document.getElementById("resultActions");
+    const lookupInputActions = document.getElementById("lookupInputActions");
+    const lookupResultActions = document.getElementById("lookupResultActions");
 
     const lineBreakButtons = Array.from(document.querySelectorAll("#processBtn, #docxBtn, #pptxBtn, #xlsxBtn"));
     const lookupButtons = Array.from(document.querySelectorAll("#lookupBtn, #useLookupBtn"));
@@ -534,6 +542,19 @@
       lookupMeta.textContent = `${lineCount(text)} lines`;
     }
 
+    function isRealOutputText(target) {
+      const text = target.textContent.trim();
+      const placeholder = (target.dataset.placeholder || "").trim();
+      return Boolean(text && text !== placeholder);
+    }
+
+    function updateFieldActions() {
+      sourceActions.hidden = !sourceText.value.trim();
+      lookupInputActions.hidden = !lookupInput.value.trim();
+      resultActions.hidden = !isRealOutputText(resultText);
+      lookupResultActions.hidden = !isRealOutputText(lookupResult);
+    }
+
     function showCopyAlert(message, icon = "success") {
       if (!window.Swal) {
         window.alert(message);
@@ -551,18 +572,16 @@
       });
     }
 
-    function getCopyableText(target, emptyPlaceholder) {
-      const text = target.textContent.trim();
-
-      if (!text || text === emptyPlaceholder) {
+    function getCopyableText(target) {
+      if (!isRealOutputText(target)) {
         return "";
       }
 
       return target.textContent;
     }
 
-    async function copyOutput(target, emptyPlaceholder) {
-      const text = getCopyableText(target, emptyPlaceholder);
+    async function copyOutput(target) {
+      const text = getCopyableText(target);
 
       if (!text) {
         showCopyAlert("No output text to copy.", "error");
@@ -579,7 +598,6 @@
 
     function eraseField(target, options = {}) {
       const {
-        placeholder = "",
         metaUpdater,
         afterErase,
         focus = false
@@ -589,7 +607,7 @@
         target.value = "";
         target.dispatchEvent(new Event("input", { bubbles: true }));
       } else {
-        target.textContent = placeholder;
+        target.textContent = "";
       }
 
       if (metaUpdater) {
@@ -599,6 +617,8 @@
       if (afterErase) {
         afterErase();
       }
+
+      updateFieldActions();
 
       if (focus) {
         target.focus();
@@ -630,6 +650,7 @@
         const data = await response.json();
         resultText.textContent = data.result || "";
         updateOutputMeta(data.result || "");
+        updateFieldActions();
         setStatus(statusText, "Processed successfully.");
       } catch (error) {
         setStatus(statusText, error.message, true);
@@ -687,6 +708,7 @@
 
         lookupResult.textContent = data.output || "";
         updateLookupMeta(data.output || "");
+        updateFieldActions();
         setStatus(lookupStatus, `${data.unique_count} unique reference(s) generated.`);
       } catch (error) {
         setStatus(lookupStatus, error.message, true);
@@ -696,11 +718,10 @@
     }
 
     function useLookupInInput() {
-      const text = lookupResult.textContent === "Generated Bible text will appear here."
-        ? ""
-        : lookupResult.textContent;
+      const text = isRealOutputText(lookupResult) ? lookupResult.textContent : "";
       sourceText.value = text;
       updateInputMeta();
+      updateFieldActions();
       setStatus(statusText, text ? "Lookup text copied into input." : "No lookup text available.", !text);
       if (text) {
         activateTab("line-break-panel");
@@ -710,15 +731,19 @@
     tabButtons.forEach((button) => {
       button.addEventListener("click", () => activateTab(button.dataset.tabTarget));
     });
-    sourceText.addEventListener("input", updateInputMeta);
+    sourceText.addEventListener("input", () => {
+      updateInputMeta();
+      updateFieldActions();
+    });
+    lookupInput.addEventListener("input", updateFieldActions);
     document.getElementById("processBtn").addEventListener("click", processText);
     document.getElementById("docxBtn").addEventListener("click", () => downloadFile("/line-break/export_docx", "output.docx"));
     document.getElementById("pptxBtn").addEventListener("click", () => downloadFile("/line-break/export_ppt", "output.pptx"));
     document.getElementById("xlsxBtn").addEventListener("click", () => downloadFile("/line-break/export_xlsx", "output.xlsx"));
     document.getElementById("lookupBtn").addEventListener("click", lookupVerse);
     document.getElementById("useLookupBtn").addEventListener("click", useLookupInInput);
-    copyResultBtn.addEventListener("click", () => copyOutput(resultText, processedPlaceholder));
-    copyLookupBtn.addEventListener("click", () => copyOutput(lookupResult, generatedPlaceholder));
+    copyResultBtn.addEventListener("click", () => copyOutput(resultText));
+    copyLookupBtn.addEventListener("click", () => copyOutput(lookupResult));
     eraseSourceBtn.addEventListener("click", () => eraseField(sourceText, {
       afterErase: updateInputMeta,
       focus: true
@@ -730,6 +755,7 @@
     updateInputMeta();
     updateOutputMeta("");
     updateLookupMeta("");
+    updateFieldActions();
     activateTab("line-break-panel");
   </script>
 </body>
