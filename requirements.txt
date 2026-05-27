@@ -1,6 +1,7 @@
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.13.0
+Babel==2.17.0
 certifi==2026.2.25
 click==8.3.2
 et_xmlfile==2.0.0
@@ -10,7 +11,9 @@ httpcore==1.0.9
 httpx==0.28.1
 idna==3.11
 iniconfig==2.3.0
+Jinja2==3.1.6
 lxml==6.0.2
+MarkupSafe==3.0.3
 openpyxl==3.1.5
 packaging==26.0
 pillow==12.2.0

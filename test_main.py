@@ -26,12 +26,39 @@ def test_client_page():
     response = client.get('/client')
     assert response.status_code == 200
     assert 'text/html' in response.headers['content-type']
+    assert '<html lang="en">' in response.text
     assert 'Line Break Test Client' in response.text
     assert 'line break' in response.text
     assert 'bible lookup' in response.text
     assert '/line-break/export_xlsx' in response.text
     assert '/bible/generate' in response.text
     assert 'Generate Bible Text' in response.text
+    assert 'Output copied.' in response.text
+    assert 'id="copyResultBtn"' in response.text
+    assert 'id="copyLookupBtn"' in response.text
+    assert 'id="eraseSourceBtn"' in response.text
+    assert 'id="eraseLookupInputBtn"' in response.text
+    assert 'id="eraseResultBtn"' not in response.text
+    assert 'id="eraseLookupResultBtn"' not in response.text
+
+
+def test_client_page_korean_query_locale():
+    response = client.get('/client', params={'lang': 'ko'})
+    assert response.status_code == 200
+    assert '<html lang="ko">' in response.text
+    assert '줄바꿈 테스트 클라이언트' in response.text
+    assert '성경 본문 생성' in response.text
+    assert '처리된 출력 복사' in response.text
+    assert '출력이 복사되었습니다.' in response.text
+    assert '/line-break/export_xlsx' in response.text
+    assert '/bible/generate' in response.text
+
+
+def test_client_page_korean_accept_language():
+    response = client.get('/client', headers={'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8'})
+    assert response.status_code == 200
+    assert '<html lang="ko">' in response.text
+    assert '입력 텍스트' in response.text
 
 
 def make_bible_payload(module: str, book_name: str, text: str):

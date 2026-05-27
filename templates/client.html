@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ locale }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Line Break Test Client</title>
+  <title>{{ _("Line Break Test Client") }}</title>
   <style>
     :root {
       color-scheme: light;
@@ -53,6 +53,13 @@
         linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent);
     }
 
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
     .hero h1 {
       margin: 0 0 10px;
       font-size: clamp(2rem, 4vw, 3.1rem);
@@ -66,6 +73,31 @@
       color: var(--muted);
       font-size: 1.02rem;
       line-height: 1.6;
+    }
+
+    .language-switch {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 0 0 auto;
+      font: 600 0.78rem/1 "Avenir Next", "Segoe UI", sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .language-switch a {
+      color: var(--accent-strong);
+      text-decoration: none;
+      border: 1px solid rgba(216, 200, 181, 0.95);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.72);
+      padding: 8px 10px;
+    }
+
+    .language-switch a[aria-current="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
     }
 
     .section {
@@ -344,36 +376,41 @@
 <body>
   <main class="shell">
     <section class="hero">
-      <h1>Line Break Test Client</h1>
+      <div class="hero-top">
+        <h1>{{ _("Line Break Test Client") }}</h1>
+        <nav class="language-switch" aria-label="{{ _('Language') }}">
+          <a href="/client?lang=en" aria-current="{{ 'true' if locale == 'en' else 'false' }}">EN</a>
+          <a href="/client?lang=ko" aria-current="{{ 'true' if locale == 'ko' else 'false' }}">한국어</a>
+        </nav>
+      </div>
       <p>
-        Generate Korean Bible text from multiple references, move the result into the line-break workflow,
-        then process and export it.
+        {{ _("Generate Korean Bible text from multiple references, move the result into the line-break workflow, then process and export it.") }}
       </p>
     </section>
 
-    <nav class="tabs" aria-label="Client Tools">
-      <button class="tab-button" type="button" data-tab-target="line-break-panel" aria-selected="true">line break</button>
-      <button class="tab-button" type="button" data-tab-target="bible-lookup-panel" aria-selected="false">bible lookup</button>
+    <nav class="tabs" aria-label="{{ _('Client Tools') }}">
+      <button class="tab-button" type="button" data-tab-target="line-break-panel" aria-selected="true">{{ _("line break") }}</button>
+      <button class="tab-button" type="button" data-tab-target="bible-lookup-panel" aria-selected="false">{{ _("bible lookup") }}</button>
     </nav>
 
     <section class="section tab-panel is-active" id="line-break-panel">
       <div class="section-header">
         <div>
-          <h2 class="section-title">Line Break Tools</h2>
-          <p class="section-copy">Calls <code>/line-break</code>, <code>/line-break/export_docx</code>, <code>/line-break/export_ppt</code>, and <code>/line-break/export_xlsx</code>.</p>
+          <h2 class="section-title">{{ _("Line Break Tools") }}</h2>
+          <p class="section-copy">{{ _("Calls") }} <code>/line-break</code>, <code>/line-break/export_docx</code>, <code>/line-break/export_ppt</code>, {{ _("and") }} <code>/line-break/export_xlsx</code>.</p>
         </div>
       </div>
 
       <div class="tool-grid">
         <section class="panel">
           <div class="meta-row">
-            <span>Input Text</span>
-            <span id="inputMeta">0 chars</span>
+            <span>{{ _("Input Text") }}</span>
+            <span id="inputMeta">0 {{ _("chars") }}</span>
           </div>
           <div class="field-shell">
             <textarea id="sourceText" spellcheck="false" placeholder="창1:1 태초에 하나님이 천지를 창조하시니라&#10;&#10;창1:2 땅이 혼돈하고 공허하며"></textarea>
             <div class="field-actions" id="sourceActions" hidden>
-              <button class="field-icon-button eraser-button" id="eraseSourceBtn" type="button" aria-label="Clear input text" title="Clear input text">
+              <button class="field-icon-button eraser-button" id="eraseSourceBtn" type="button" aria-label="{{ _('Clear input text') }}" title="{{ _('Clear input text') }}">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="m7 21-4-4L14 6l4 4L7 21Z"></path>
                   <path d="m14 6 3-3 4 4-3 3"></path>
@@ -384,27 +421,27 @@
           </div>
 
           <div class="controls" style="margin-top: 18px;">
-            <button class="primary" id="processBtn" type="button">Process Text</button>
-            <button class="secondary" id="docxBtn" type="button">Download DOCX</button>
-            <button class="secondary" id="pptxBtn" type="button">Download PPTX</button>
-            <button class="secondary" id="xlsxBtn" type="button">Download XLSX</button>
+            <button class="primary" id="processBtn" type="button">{{ _("Process Text") }}</button>
+            <button class="secondary" id="docxBtn" type="button">{{ _("Download DOCX") }}</button>
+            <button class="secondary" id="pptxBtn" type="button">{{ _("Download PPTX") }}</button>
+            <button class="secondary" id="xlsxBtn" type="button">{{ _("Download XLSX") }}</button>
           </div>
 
-          <div class="status" id="statusText" style="margin-top: 16px;">Ready.</div>
+          <div class="status" id="statusText" style="margin-top: 16px;">{{ _("Ready.") }}</div>
           <p class="hint" style="margin-top: 14px;">
-            Paste any source text here and run the existing line-break and export endpoints.
+            {{ _("Paste any source text here and run the existing line-break and export endpoints.") }}
           </p>
         </section>
 
         <section class="panel">
           <div class="meta-row">
-            <span>Processed Output</span>
-            <span id="outputMeta">0 lines</span>
+            <span>{{ _("Processed Output") }}</span>
+            <span id="outputMeta">0 {{ _("lines") }}</span>
           </div>
           <div class="field-shell has-copy">
-            <pre id="resultText" data-placeholder="Processed text will appear here."></pre>
+            <pre id="resultText" data-placeholder="{{ _('Processed text will appear here.') }}"></pre>
             <div class="field-actions" id="resultActions" hidden>
-              <button class="field-icon-button copy-output-button" id="copyResultBtn" type="button" aria-label="Copy processed output" title="Copy processed output">
+              <button class="field-icon-button copy-output-button" id="copyResultBtn" type="button" aria-label="{{ _('Copy processed output') }}" title="{{ _('Copy processed output') }}">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -419,8 +456,8 @@
     <section class="section tab-panel" id="bible-lookup-panel">
       <div class="section-header">
         <div>
-          <h2 class="section-title">Bible Lookup</h2>
-          <p class="section-copy">Calls <code>/bible/generate</code> and expands multiple Korean references into one combined text block.</p>
+          <h2 class="section-title">{{ _("Bible Lookup") }}</h2>
+          <p class="section-copy">{{ _("Calls") }} <code>/bible/generate</code> {{ _("and expands multiple Korean references into one combined text block.") }}</p>
         </div>
       </div>
 
@@ -428,11 +465,11 @@
         <section class="panel">
           <div class="stack">
             <div>
-              <label class="field-label" for="lookupInput">Input References</label>
+              <label class="field-label" for="lookupInput">{{ _("Input References") }}</label>
               <div class="field-shell">
                 <textarea id="lookupInput" spellcheck="false" placeholder="마25:21&#10;마25:29&#10;사43:7&#10;계2:8-13&#10;고전15:58&#10;고전15:10"></textarea>
                 <div class="field-actions" id="lookupInputActions" hidden>
-                  <button class="field-icon-button eraser-button" id="eraseLookupInputBtn" type="button" aria-label="Clear input references" title="Clear input references">
+                  <button class="field-icon-button eraser-button" id="eraseLookupInputBtn" type="button" aria-label="{{ _('Clear input references') }}" title="{{ _('Clear input references') }}">
                     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="m7 21-4-4L14 6l4 4L7 21Z"></path>
                       <path d="m14 6 3-3 4 4-3 3"></path>
@@ -444,24 +481,24 @@
             </div>
 
             <div class="controls">
-              <button class="primary" id="lookupBtn" type="button">Generate Bible Text</button>
-              <button class="secondary" id="useLookupBtn" type="button">Use In Input</button>
+              <button class="primary" id="lookupBtn" type="button">{{ _("Generate Bible Text") }}</button>
+              <button class="secondary" id="useLookupBtn" type="button">{{ _("Use In Input") }}</button>
             </div>
 
-            <div class="status" id="lookupStatus">Ready.</div>
-            <p class="hint">Accepted examples: <code>마25:21</code>, <code>계2:8-13</code>, <code>고전15:10</code>. Duplicate references are removed automatically.</p>
+            <div class="status" id="lookupStatus">{{ _("Ready.") }}</div>
+            <p class="hint">{{ _("Accepted examples:") }} <code>마25:21</code>, <code>계2:8-13</code>, <code>고전15:10</code>. {{ _("Duplicate references are removed automatically.") }}</p>
           </div>
         </section>
 
         <section class="panel">
           <div class="meta-row">
-            <span>Generated Output</span>
-            <span id="lookupMeta">0 lines</span>
+            <span>{{ _("Generated Output") }}</span>
+            <span id="lookupMeta">0 {{ _("lines") }}</span>
           </div>
           <div class="field-shell has-copy">
-            <pre id="lookupResult" class="lookup-output" data-placeholder="Generated Bible text will appear here."></pre>
+            <pre id="lookupResult" class="lookup-output" data-placeholder="{{ _('Generated Bible text will appear here.') }}"></pre>
             <div class="field-actions" id="lookupResultActions" hidden>
-              <button class="field-icon-button copy-output-button" id="copyLookupBtn" type="button" aria-label="Copy generated output" title="Copy generated output">
+              <button class="field-icon-button copy-output-button" id="copyLookupBtn" type="button" aria-label="{{ _('Copy generated output') }}" title="{{ _('Copy generated output') }}">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -477,6 +514,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+    const i18n = {{ i18n_json | safe }};
+
     const tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
     const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
 
@@ -526,20 +565,26 @@
       target.style.color = isError ? "var(--danger)" : "var(--muted)";
     }
 
+    function formatMessage(message, values = {}) {
+      return message.replace(/\{(\w+)\}/g, (match, key) => {
+        return Object.prototype.hasOwnProperty.call(values, key) ? values[key] : match;
+      });
+    }
+
     function lineCount(text) {
       return text ? text.split(/\r\n|\r|\n/).length : 0;
     }
 
     function updateInputMeta() {
-      inputMeta.textContent = `${sourceText.value.length} chars`;
+      inputMeta.textContent = `${sourceText.value.length} ${i18n.chars_suffix}`;
     }
 
     function updateOutputMeta(text) {
-      outputMeta.textContent = `${lineCount(text)} lines`;
+      outputMeta.textContent = `${lineCount(text)} ${i18n.lines_suffix}`;
     }
 
     function updateLookupMeta(text) {
-      lookupMeta.textContent = `${lineCount(text)} lines`;
+      lookupMeta.textContent = `${lineCount(text)} ${i18n.lines_suffix}`;
     }
 
     function isRealOutputText(target) {
@@ -584,15 +629,15 @@
       const text = getCopyableText(target);
 
       if (!text) {
-        showCopyAlert("No output text to copy.", "error");
+        showCopyAlert(i18n.no_output, "error");
         return;
       }
 
       try {
         await navigator.clipboard.writeText(text);
-        showCopyAlert("Output copied.");
+        showCopyAlert(i18n.copied);
       } catch (error) {
-        showCopyAlert("Unable to copy output.", "error");
+        showCopyAlert(i18n.copy_failed, "error");
       }
     }
 
@@ -625,6 +670,12 @@
       }
     }
 
+    function clearOutput(target, metaUpdater) {
+      target.textContent = "";
+      metaUpdater("");
+      updateFieldActions();
+    }
+
     async function postJson(url) {
       const response = await fetch(url, {
         method: "POST",
@@ -635,7 +686,7 @@
       });
 
       if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+        throw new Error(formatMessage(i18n.request_failed, { status: response.status }));
       }
 
       return response;
@@ -643,7 +694,7 @@
 
     async function processText() {
       setBusy(lineBreakButtons, true);
-      setStatus(statusText, "Processing text...");
+      setStatus(statusText, i18n.processing);
 
       try {
         const response = await postJson("/line-break");
@@ -651,7 +702,7 @@
         resultText.textContent = data.result || "";
         updateOutputMeta(data.result || "");
         updateFieldActions();
-        setStatus(statusText, "Processed successfully.");
+        setStatus(statusText, i18n.processed);
       } catch (error) {
         setStatus(statusText, error.message, true);
       } finally {
@@ -661,7 +712,7 @@
 
     async function downloadFile(url, filename) {
       setBusy(lineBreakButtons, true);
-      setStatus(statusText, `Preparing ${filename}...`);
+      setStatus(statusText, formatMessage(i18n.preparing, { filename }));
 
       try {
         const response = await postJson(url);
@@ -674,7 +725,7 @@
         link.click();
         link.remove();
         URL.revokeObjectURL(objectUrl);
-        setStatus(statusText, `${filename} downloaded.`);
+        setStatus(statusText, formatMessage(i18n.downloaded, { filename }));
       } catch (error) {
         setStatus(statusText, error.message, true);
       } finally {
@@ -685,12 +736,12 @@
     async function lookupVerse() {
       const text = lookupInput.value.trim();
       if (!text) {
-        setStatus(lookupStatus, "Reference is required.", true);
+        setStatus(lookupStatus, i18n.reference_required, true);
         return;
       }
 
       setBusy(lookupButtons, true);
-      setStatus(lookupStatus, "Generating Bible text...");
+      setStatus(lookupStatus, i18n.generating);
 
       try {
         const response = await fetch("/bible/generate", {
@@ -703,13 +754,13 @@
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.detail || `Request failed with status ${response.status}`);
+          throw new Error(data.detail || formatMessage(i18n.request_failed, { status: response.status }));
         }
 
         lookupResult.textContent = data.output || "";
         updateLookupMeta(data.output || "");
         updateFieldActions();
-        setStatus(lookupStatus, `${data.unique_count} unique reference(s) generated.`);
+        setStatus(lookupStatus, formatMessage(i18n.generated, { count: data.unique_count }));
       } catch (error) {
         setStatus(lookupStatus, error.message, true);
       } finally {
@@ -722,7 +773,7 @@
       sourceText.value = text;
       updateInputMeta();
       updateFieldActions();
-      setStatus(statusText, text ? "Lookup text copied into input." : "No lookup text available.", !text);
+      setStatus(statusText, text ? i18n.lookup_used : i18n.lookup_empty, !text);
       if (text) {
         activateTab("line-break-panel");
       }
@@ -744,13 +795,19 @@
     document.getElementById("useLookupBtn").addEventListener("click", useLookupInInput);
     copyResultBtn.addEventListener("click", () => copyOutput(resultText));
     copyLookupBtn.addEventListener("click", () => copyOutput(lookupResult));
-    eraseSourceBtn.addEventListener("click", () => eraseField(sourceText, {
-      afterErase: updateInputMeta,
-      focus: true
-    }));
-    eraseLookupInputBtn.addEventListener("click", () => eraseField(lookupInput, {
-      focus: true
-    }));
+    eraseSourceBtn.addEventListener("click", () => {
+      eraseField(sourceText, {
+        afterErase: updateInputMeta,
+        focus: true
+      });
+      clearOutput(resultText, updateOutputMeta);
+    });
+    eraseLookupInputBtn.addEventListener("click", () => {
+      eraseField(lookupInput, {
+        focus: true
+      });
+      clearOutput(lookupResult, updateLookupMeta);
+    });
 
     updateInputMeta();
     updateOutputMeta("");

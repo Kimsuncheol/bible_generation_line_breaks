@@ -1,0 +1,151 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: bible-generation-line-breaks 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-28 00:00+0900\n"
+"PO-Revision-Date: 2026-05-28 00:00+0900\n"
+"Last-Translator: \n"
+"Language: ko\n"
+"Language-Team: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+msgid "Line Break Test Client"
+msgstr "줄바꿈 테스트 클라이언트"
+
+msgid "Generate Korean Bible text from multiple references, move the result into the line-break workflow, then process and export it."
+msgstr "여러 성경 구절에서 한국어 성경 본문을 생성하고, 결과를 줄바꿈 작업으로 옮긴 뒤 처리하고 내보냅니다."
+
+msgid "Client Tools"
+msgstr "클라이언트 도구"
+
+msgid "Language"
+msgstr "언어"
+
+msgid "line break"
+msgstr "줄바꿈"
+
+msgid "bible lookup"
+msgstr "성경 조회"
+
+msgid "Line Break Tools"
+msgstr "줄바꿈 도구"
+
+msgid "Calls"
+msgstr "호출:"
+
+msgid "and"
+msgstr "및"
+
+msgid "Input Text"
+msgstr "입력 텍스트"
+
+msgid "chars"
+msgstr "자"
+
+msgid "Clear input text"
+msgstr "입력 텍스트 지우기"
+
+msgid "Process Text"
+msgstr "텍스트 처리"
+
+msgid "Download DOCX"
+msgstr "DOCX 다운로드"
+
+msgid "Download PPTX"
+msgstr "PPTX 다운로드"
+
+msgid "Download XLSX"
+msgstr "XLSX 다운로드"
+
+msgid "Ready."
+msgstr "준비됨."
+
+msgid "Paste any source text here and run the existing line-break and export endpoints."
+msgstr "여기에 원본 텍스트를 붙여넣고 기존 줄바꿈 및 내보내기 엔드포인트를 실행하세요."
+
+msgid "Processed Output"
+msgstr "처리된 출력"
+
+msgid "lines"
+msgstr "줄"
+
+msgid "Processed text will appear here."
+msgstr "처리된 텍스트가 여기에 표시됩니다."
+
+msgid "Copy processed output"
+msgstr "처리된 출력 복사"
+
+msgid "Bible Lookup"
+msgstr "성경 조회"
+
+msgid "and expands multiple Korean references into one combined text block."
+msgstr "여러 한국어 성경 구절을 하나의 텍스트 블록으로 확장합니다."
+
+msgid "Input References"
+msgstr "입력 구절"
+
+msgid "Clear input references"
+msgstr "입력 구절 지우기"
+
+msgid "Generate Bible Text"
+msgstr "성경 본문 생성"
+
+msgid "Use In Input"
+msgstr "입력에 사용"
+
+msgid "Accepted examples:"
+msgstr "허용되는 예:"
+
+msgid "Duplicate references are removed automatically."
+msgstr "중복 구절은 자동으로 제거됩니다."
+
+msgid "Generated Output"
+msgstr "생성된 출력"
+
+msgid "Generated Bible text will appear here."
+msgstr "생성된 성경 본문이 여기에 표시됩니다."
+
+msgid "Copy generated output"
+msgstr "생성된 출력 복사"
+
+msgid "No output text to copy."
+msgstr "복사할 출력 텍스트가 없습니다."
+
+msgid "Output copied."
+msgstr "출력이 복사되었습니다."
+
+msgid "Unable to copy output."
+msgstr "출력을 복사할 수 없습니다."
+
+msgid "Request failed with status {status}"
+msgstr "요청이 상태 코드 {status}로 실패했습니다."
+
+msgid "Processing text..."
+msgstr "텍스트 처리 중..."
+
+msgid "Processed successfully."
+msgstr "처리가 완료되었습니다."
+
+msgid "Preparing {filename}..."
+msgstr "{filename} 준비 중..."
+
+msgid "{filename} downloaded."
+msgstr "{filename} 다운로드됨."
+
+msgid "Reference is required."
+msgstr "구절 입력이 필요합니다."
+
+msgid "Generating Bible text..."
+msgstr "성경 본문 생성 중..."
+
+msgid "{count} unique reference(s) generated."
+msgstr "고유 구절 {count}개가 생성되었습니다."
+
+msgid "Lookup text copied into input."
+msgstr "조회 텍스트를 입력에 복사했습니다."
+
+msgid "No lookup text available."
+msgstr "사용할 조회 텍스트가 없습니다."
