@@ -197,8 +197,60 @@
       word-break: break-word;
     }
 
+    .field-shell {
+      position: relative;
+    }
+
+    .field-shell textarea,
+    .field-shell pre {
+      padding: 54px 58px 18px 20px;
+    }
+
+    .field-shell.has-copy pre {
+      padding-right: 98px;
+    }
+
     .lookup-output {
       min-height: 180px;
+    }
+
+    .field-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .field-icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 30px;
+      padding: 0;
+      border: 1px solid rgba(216, 200, 181, 0.95);
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(29, 36, 51, 0.08);
+    }
+
+    .field-icon-button:hover {
+      background: #fff;
+    }
+
+    .copy-output-button {
+      color: var(--accent-strong);
+    }
+
+    .eraser-button {
+      color: var(--danger);
+    }
+
+    .field-icon-button svg {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
     }
 
     .controls {
@@ -312,7 +364,18 @@
             <span>Input Text</span>
             <span id="inputMeta">0 chars</span>
           </div>
-          <textarea id="sourceText" spellcheck="false" placeholder="창1:1 태초에 하나님이 천지를 창조하시니라&#10;&#10;창1:2 땅이 혼돈하고 공허하며"></textarea>
+          <div class="field-shell">
+            <textarea id="sourceText" spellcheck="false" placeholder="창1:1 태초에 하나님이 천지를 창조하시니라&#10;&#10;창1:2 땅이 혼돈하고 공허하며"></textarea>
+            <div class="field-actions">
+              <button class="field-icon-button eraser-button" id="eraseSourceBtn" type="button" aria-label="Clear input text" title="Clear input text">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m7 21-4-4L14 6l4 4L7 21Z"></path>
+                  <path d="m14 6 3-3 4 4-3 3"></path>
+                  <path d="M5 19h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
 
           <div class="controls" style="margin-top: 18px;">
             <button class="primary" id="processBtn" type="button">Process Text</button>
@@ -332,7 +395,17 @@
             <span>Processed Output</span>
             <span id="outputMeta">0 lines</span>
           </div>
-          <pre id="resultText">Processed text will appear here.</pre>
+          <div class="field-shell has-copy">
+            <pre id="resultText">Processed text will appear here.</pre>
+            <div class="field-actions">
+              <button class="field-icon-button copy-output-button" id="copyResultBtn" type="button" aria-label="Copy processed output" title="Copy processed output">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
         </section>
       </div>
     </section>
@@ -350,7 +423,18 @@
           <div class="stack">
             <div>
               <label class="field-label" for="lookupInput">Input References</label>
-              <textarea id="lookupInput" spellcheck="false" placeholder="마25:21&#10;마25:29&#10;사43:7&#10;계2:8-13&#10;고전15:58&#10;고전15:10"></textarea>
+              <div class="field-shell">
+                <textarea id="lookupInput" spellcheck="false" placeholder="마25:21&#10;마25:29&#10;사43:7&#10;계2:8-13&#10;고전15:58&#10;고전15:10"></textarea>
+                <div class="field-actions">
+                  <button class="field-icon-button eraser-button" id="eraseLookupInputBtn" type="button" aria-label="Clear input references" title="Clear input references">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="m7 21-4-4L14 6l4 4L7 21Z"></path>
+                      <path d="m14 6 3-3 4 4-3 3"></path>
+                      <path d="M5 19h16"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div class="controls">
@@ -368,14 +452,28 @@
             <span>Generated Output</span>
             <span id="lookupMeta">0 lines</span>
           </div>
-          <pre id="lookupResult" class="lookup-output">Generated Bible text will appear here.</pre>
+          <div class="field-shell has-copy">
+            <pre id="lookupResult" class="lookup-output">Generated Bible text will appear here.</pre>
+            <div class="field-actions">
+              <button class="field-icon-button copy-output-button" id="copyLookupBtn" type="button" aria-label="Copy generated output" title="Copy generated output">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
         </section>
       </div>
     </section>
 
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+    const processedPlaceholder = "Processed text will appear here.";
+    const generatedPlaceholder = "Generated Bible text will appear here.";
+
     const tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
     const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
 
@@ -389,6 +487,11 @@
     const lookupResult = document.getElementById("lookupResult");
     const lookupMeta = document.getElementById("lookupMeta");
     const lookupStatus = document.getElementById("lookupStatus");
+
+    const copyResultBtn = document.getElementById("copyResultBtn");
+    const copyLookupBtn = document.getElementById("copyLookupBtn");
+    const eraseSourceBtn = document.getElementById("eraseSourceBtn");
+    const eraseLookupInputBtn = document.getElementById("eraseLookupInputBtn");
 
     const lineBreakButtons = Array.from(document.querySelectorAll("#processBtn, #docxBtn, #pptxBtn, #xlsxBtn"));
     const lookupButtons = Array.from(document.querySelectorAll("#lookupBtn, #useLookupBtn"));
@@ -429,6 +532,77 @@
 
     function updateLookupMeta(text) {
       lookupMeta.textContent = `${lineCount(text)} lines`;
+    }
+
+    function showCopyAlert(message, icon = "success") {
+      if (!window.Swal) {
+        window.alert(message);
+        return;
+      }
+
+      window.Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon,
+        title: message,
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true
+      });
+    }
+
+    function getCopyableText(target, emptyPlaceholder) {
+      const text = target.textContent.trim();
+
+      if (!text || text === emptyPlaceholder) {
+        return "";
+      }
+
+      return target.textContent;
+    }
+
+    async function copyOutput(target, emptyPlaceholder) {
+      const text = getCopyableText(target, emptyPlaceholder);
+
+      if (!text) {
+        showCopyAlert("No output text to copy.", "error");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        showCopyAlert("Output copied.");
+      } catch (error) {
+        showCopyAlert("Unable to copy output.", "error");
+      }
+    }
+
+    function eraseField(target, options = {}) {
+      const {
+        placeholder = "",
+        metaUpdater,
+        afterErase,
+        focus = false
+      } = options;
+
+      if ("value" in target) {
+        target.value = "";
+        target.dispatchEvent(new Event("input", { bubbles: true }));
+      } else {
+        target.textContent = placeholder;
+      }
+
+      if (metaUpdater) {
+        metaUpdater("");
+      }
+
+      if (afterErase) {
+        afterErase();
+      }
+
+      if (focus) {
+        target.focus();
+      }
     }
 
     async function postJson(url) {
@@ -543,6 +717,15 @@
     document.getElementById("xlsxBtn").addEventListener("click", () => downloadFile("/line-break/export_xlsx", "output.xlsx"));
     document.getElementById("lookupBtn").addEventListener("click", lookupVerse);
     document.getElementById("useLookupBtn").addEventListener("click", useLookupInInput);
+    copyResultBtn.addEventListener("click", () => copyOutput(resultText, processedPlaceholder));
+    copyLookupBtn.addEventListener("click", () => copyOutput(lookupResult, generatedPlaceholder));
+    eraseSourceBtn.addEventListener("click", () => eraseField(sourceText, {
+      afterErase: updateInputMeta,
+      focus: true
+    }));
+    eraseLookupInputBtn.addEventListener("click", () => eraseField(lookupInput, {
+      focus: true
+    }));
 
     updateInputMeta();
     updateOutputMeta("");

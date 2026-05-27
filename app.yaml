@@ -1,0 +1,7 @@
+runtime: python311
+instance_class: F1
+entrypoint: uvicorn main:app --host=0.0.0.0 --port=$PORT
+
+# Keep it at 1 max instance to ensure you don't exceed the free tier of 28 instance hours/day
+automatic_scaling:
+  max_instances: 1
