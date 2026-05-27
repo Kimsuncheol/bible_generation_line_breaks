@@ -290,6 +290,15 @@ class TestLineBreak:
         assert '1)말씀이' in result
         assert '1)\n말씀이' not in result
 
+    def test_parenthetical_content_after_reference(self):
+        text = '눅23:51 (그들의 결의와 행사에 찬성하지 아니한 자라) 그는 유대인의 동네 아리마대 사람이요 하나님의 나라를 기다리는 자라'
+        response = client.post('/line-break', json={'text': text})
+        assert response.status_code == 200
+        assert response.json()['result'] == (
+            '눅23:51\n'
+            '(그들의 결의와 행사에 찬성하지 아니한 자라) 그는 유대인의 동네 아리마대 사람이요 하나님의 나라를 기다리는 자라'
+        )
+
     def test_no_digit_korean_boundary(self):
         text = '태초에 하나님이 천지를 창조하시니라'
         response = client.post('/line-break', json={'text': text})

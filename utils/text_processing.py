@@ -14,5 +14,5 @@ def apply_line_break(text: str) -> str:
     # Step 1: normalize verse separators
     result = normalize(text)
     # Step 2: insert \n between verse-ref number and Korean content
-    result = re.sub(r'(\d)(?!\))[ ]+([가-힣])', r'\1\n\2', result)
+    result = re.sub(r'(^|\n)([가-힣]+\d+:\d+(?:-\d+)?)[ \t]+', r'\1\2\n', result)
     return result
