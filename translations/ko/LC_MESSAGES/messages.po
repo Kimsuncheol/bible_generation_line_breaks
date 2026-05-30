@@ -33,6 +33,15 @@ msgstr "성경 조회"
 msgid "Line Break Tools"
 msgstr "줄바꿈 도구"
 
+msgid "Line Break Modes"
+msgstr "줄바꿈 모드"
+
+msgid "Bible"
+msgstr "성경"
+
+msgid "General Text"
+msgstr "일반 텍스트"
+
 msgid "Calls"
 msgstr "호출:"
 
@@ -77,6 +86,54 @@ msgstr "처리된 텍스트가 여기에 표시됩니다."
 
 msgid "Copy processed output"
 msgstr "처리된 출력 복사"
+
+msgid "General Input"
+msgstr "일반 입력"
+
+msgid "Paste general text here."
+msgstr "일반 텍스트를 여기에 붙여넣으세요."
+
+msgid "Clear general input"
+msgstr "일반 입력 지우기"
+
+msgid "Criterion"
+msgstr "기준"
+
+msgid "List style"
+msgstr "목록 스타일"
+
+msgid "None"
+msgstr "없음"
+
+msgid "Arabic number"
+msgstr "아라비아 숫자"
+
+msgid "Roman number"
+msgstr "로마 숫자"
+
+msgid "Chinese number"
+msgstr "한자 숫자"
+
+msgid "Bullet"
+msgstr "글머리 기호"
+
+msgid "Check mark"
+msgstr "체크 표시"
+
+msgid "Process General Text"
+msgstr "일반 텍스트 처리"
+
+msgid "Select a line-break criterion first."
+msgstr "먼저 줄바꿈 기준을 선택하세요."
+
+msgid "General Output"
+msgstr "일반 출력"
+
+msgid "General processed text will appear here."
+msgstr "처리된 일반 텍스트가 여기에 표시됩니다."
+
+msgid "Copy general output"
+msgstr "일반 출력 복사"
 
 msgid "Bible Lookup"
 msgstr "성경 조회"
@@ -149,3 +206,9 @@ msgstr "조회 텍스트를 입력에 복사했습니다."
 
 msgid "No lookup text available."
 msgstr "사용할 조회 텍스트가 없습니다."
+
+msgid "General text is required."
+msgstr "일반 텍스트가 필요합니다."
+
+msgid "General text processed successfully."
+msgstr "일반 텍스트 처리가 완료되었습니다."

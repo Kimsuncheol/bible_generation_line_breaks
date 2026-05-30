@@ -34,6 +34,10 @@ CLIENT_MESSAGE_IDS = {
     "generated": _("{count} unique reference(s) generated."),
     "lookup_used": _("Lookup text copied into input."),
     "lookup_empty": _("No lookup text available."),
+    "ready": _("Ready."),
+    "criterion_required": _("Select a line-break criterion first."),
+    "general_input_required": _("General text is required."),
+    "general_processed": _("General text processed successfully."),
 }
 
 

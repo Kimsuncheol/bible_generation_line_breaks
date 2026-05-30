@@ -140,6 +140,37 @@
       display: block;
     }
 
+    .subtabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(216, 200, 181, 0.85);
+    }
+
+    .subtab-button {
+      border: 1px solid rgba(216, 200, 181, 0.95);
+      border-bottom: 0;
+      border-radius: 10px 10px 0 0;
+      background: rgba(255, 255, 255, 0.38);
+      color: var(--muted);
+      padding: 10px 14px;
+      font-size: 0.9rem;
+    }
+
+    .subtab-button[aria-selected="true"] {
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--accent-strong);
+      box-shadow: inset 0 3px 0 rgba(15, 118, 110, 0.45);
+    }
+
+    .subtab-panel {
+      display: none;
+    }
+
+    .subtab-panel.is-active {
+      display: block;
+    }
+
     .section-header {
       display: flex;
       align-items: baseline;
@@ -297,6 +328,35 @@
       gap: 12px;
     }
 
+    .option-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: minmax(180px, 0.8fr) minmax(220px, 1fr);
+    }
+
+    .segmented-control {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .criterion-button {
+      width: 44px;
+      height: 40px;
+      padding: 0;
+      border: 1px solid rgba(216, 200, 181, 0.95);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--accent-strong);
+      font: 700 1.05rem/1 "Avenir Next", "Segoe UI", sans-serif;
+    }
+
+    .criterion-button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
     button {
       appearance: none;
       border: 0;
@@ -370,6 +430,10 @@
       pre {
         min-height: 260px;
       }
+
+      .option-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -389,8 +453,8 @@
     </section>
 
     <nav class="tabs" aria-label="{{ _('Client Tools') }}">
-      <button class="tab-button" type="button" data-tab-target="line-break-panel" aria-selected="true">{{ _("line break") }}</button>
-      <button class="tab-button" type="button" data-tab-target="bible-lookup-panel" aria-selected="false">{{ _("bible lookup") }}</button>
+      <button class="tab-button" type="button" data-main-tab-target="line-break-panel" aria-selected="true">{{ _("line break") }}</button>
+      <button class="tab-button" type="button" data-main-tab-target="bible-lookup-panel" aria-selected="false">{{ _("bible lookup") }}</button>
     </nav>
 
     <section class="section tab-panel is-active" id="line-break-panel">
@@ -401,7 +465,13 @@
         </div>
       </div>
 
-      <div class="tool-grid">
+      <nav class="subtabs" aria-label="{{ _('Line Break Modes') }}">
+        <button class="subtab-button" type="button" data-line-break-tab-target="bible-line-break-panel" aria-selected="true">{{ _("Bible") }}</button>
+        <button class="subtab-button" type="button" data-line-break-tab-target="general-line-break-panel" aria-selected="false">{{ _("General Text") }}</button>
+      </nav>
+
+      <div class="subtab-panel is-active" id="bible-line-break-panel">
+        <div class="tool-grid">
         <section class="panel">
           <div class="meta-row">
             <span>{{ _("Input Text") }}</span>
@@ -450,6 +520,76 @@
             </div>
           </div>
         </section>
+        </div>
+      </div>
+
+      <div class="subtab-panel" id="general-line-break-panel">
+        <div class="tool-grid">
+          <section class="panel">
+            <div class="meta-row">
+              <span>{{ _("General Input") }}</span>
+              <span id="generalInputMeta">0 {{ _("chars") }}</span>
+            </div>
+            <div class="field-shell">
+              <textarea id="generalSourceText" spellcheck="false" placeholder="{{ _('Paste general text here.') }}"></textarea>
+              <div class="field-actions" id="generalSourceActions" hidden>
+                <button class="field-icon-button eraser-button" id="eraseGeneralSourceBtn" type="button" aria-label="{{ _('Clear general input') }}" title="{{ _('Clear general input') }}">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m7 21-4-4L14 6l4 4L7 21Z"></path>
+                    <path d="m14 6 3-3 4 4-3 3"></path>
+                    <path d="M5 19h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="option-grid" style="margin-top: 18px;">
+              <div>
+                <label class="field-label">{{ _("Criterion") }}</label>
+                <div class="segmented-control" role="group" aria-label="{{ _('Criterion') }}">
+                  <button class="criterion-button" type="button" data-criterion="." aria-pressed="false">.</button>
+                  <button class="criterion-button" type="button" data-criterion="," aria-pressed="false">,</button>
+                  <button class="criterion-button" type="button" data-criterion="-" aria-pressed="false">-</button>
+                </div>
+              </div>
+              <div>
+                <label class="field-label" for="generalListStyle">{{ _("List style") }}</label>
+                <select id="generalListStyle" disabled>
+                  <option value="none">{{ _("None") }}</option>
+                  <option value="arabic">{{ _("Arabic number") }}</option>
+                  <option value="roman">{{ _("Roman number") }}</option>
+                  <option value="chinese">{{ _("Chinese number") }}</option>
+                  <option value="bullet">{{ _("Bullet") }}</option>
+                  <option value="check">{{ _("Check mark") }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="controls" style="margin-top: 18px;">
+              <button class="primary" id="processGeneralBtn" type="button" disabled>{{ _("Process General Text") }}</button>
+            </div>
+
+            <div class="status" id="generalStatusText" style="margin-top: 16px;">{{ _("Select a line-break criterion first.") }}</div>
+          </section>
+
+          <section class="panel">
+            <div class="meta-row">
+              <span>{{ _("General Output") }}</span>
+              <span id="generalOutputMeta">0 {{ _("lines") }}</span>
+            </div>
+            <div class="field-shell has-copy">
+              <pre id="generalResultText" data-placeholder="{{ _('General processed text will appear here.') }}"></pre>
+              <div class="field-actions" id="generalResultActions" hidden>
+                <button class="field-icon-button copy-output-button" id="copyGeneralResultBtn" type="button" aria-label="{{ _('Copy general output') }}" title="{{ _('Copy general output') }}">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
     </section>
 
@@ -516,8 +656,11 @@
   <script>
     const i18n = {{ i18n_json | safe }};
 
-    const tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
+    const tabButtons = Array.from(document.querySelectorAll("[data-main-tab-target]"));
     const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
+    const lineBreakTabButtons = Array.from(document.querySelectorAll("[data-line-break-tab-target]"));
+    const lineBreakTabPanels = Array.from(document.querySelectorAll(".subtab-panel"));
+    const criterionButtons = Array.from(document.querySelectorAll("[data-criterion]"));
 
     const sourceText = document.getElementById("sourceText");
     const resultText = document.getElementById("resultText");
@@ -530,26 +673,50 @@
     const lookupMeta = document.getElementById("lookupMeta");
     const lookupStatus = document.getElementById("lookupStatus");
 
+    const generalSourceText = document.getElementById("generalSourceText");
+    const generalResultText = document.getElementById("generalResultText");
+    const generalInputMeta = document.getElementById("generalInputMeta");
+    const generalOutputMeta = document.getElementById("generalOutputMeta");
+    const generalStatusText = document.getElementById("generalStatusText");
+    const generalListStyle = document.getElementById("generalListStyle");
+    const processGeneralBtn = document.getElementById("processGeneralBtn");
+
     const copyResultBtn = document.getElementById("copyResultBtn");
     const copyLookupBtn = document.getElementById("copyLookupBtn");
+    const copyGeneralResultBtn = document.getElementById("copyGeneralResultBtn");
     const eraseSourceBtn = document.getElementById("eraseSourceBtn");
     const eraseLookupInputBtn = document.getElementById("eraseLookupInputBtn");
+    const eraseGeneralSourceBtn = document.getElementById("eraseGeneralSourceBtn");
 
     const sourceActions = document.getElementById("sourceActions");
     const resultActions = document.getElementById("resultActions");
     const lookupInputActions = document.getElementById("lookupInputActions");
     const lookupResultActions = document.getElementById("lookupResultActions");
+    const generalSourceActions = document.getElementById("generalSourceActions");
+    const generalResultActions = document.getElementById("generalResultActions");
 
     const lineBreakButtons = Array.from(document.querySelectorAll("#processBtn, #docxBtn, #pptxBtn, #xlsxBtn"));
     const lookupButtons = Array.from(document.querySelectorAll("#lookupBtn, #useLookupBtn"));
+    let selectedGeneralCriterion = "";
 
-    function activateTab(targetId) {
+    function activateMainTab(targetId) {
       tabButtons.forEach((button) => {
-        const isActive = button.dataset.tabTarget === targetId;
+        const isActive = button.dataset.mainTabTarget === targetId;
         button.setAttribute("aria-selected", isActive ? "true" : "false");
       });
 
       tabPanels.forEach((panel) => {
+        panel.classList.toggle("is-active", panel.id === targetId);
+      });
+    }
+
+    function activateLineBreakTab(targetId) {
+      lineBreakTabButtons.forEach((button) => {
+        const isActive = button.dataset.lineBreakTabTarget === targetId;
+        button.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+
+      lineBreakTabPanels.forEach((panel) => {
         panel.classList.toggle("is-active", panel.id === targetId);
       });
     }
@@ -587,6 +754,14 @@
       lookupMeta.textContent = `${lineCount(text)} ${i18n.lines_suffix}`;
     }
 
+    function updateGeneralInputMeta() {
+      generalInputMeta.textContent = `${generalSourceText.value.length} ${i18n.chars_suffix}`;
+    }
+
+    function updateGeneralOutputMeta(text) {
+      generalOutputMeta.textContent = `${lineCount(text)} ${i18n.lines_suffix}`;
+    }
+
     function isRealOutputText(target) {
       const text = target.textContent.trim();
       const placeholder = (target.dataset.placeholder || "").trim();
@@ -598,6 +773,10 @@
       lookupInputActions.hidden = !lookupInput.value.trim();
       resultActions.hidden = !isRealOutputText(resultText);
       lookupResultActions.hidden = !isRealOutputText(lookupResult);
+      generalSourceActions.hidden = !generalSourceText.value.trim();
+      generalResultActions.hidden = !isRealOutputText(generalResultText);
+      generalListStyle.disabled = !selectedGeneralCriterion;
+      processGeneralBtn.disabled = !(selectedGeneralCriterion && generalSourceText.value.trim());
     }
 
     function showCopyAlert(message, icon = "success") {
@@ -674,6 +853,137 @@
       target.textContent = "";
       metaUpdater("");
       updateFieldActions();
+    }
+
+    function toRoman(number) {
+      const numerals = [
+        [1000, "M"],
+        [900, "CM"],
+        [500, "D"],
+        [400, "CD"],
+        [100, "C"],
+        [90, "XC"],
+        [50, "L"],
+        [40, "XL"],
+        [10, "X"],
+        [9, "IX"],
+        [5, "V"],
+        [4, "IV"],
+        [1, "I"]
+      ];
+      let remaining = number;
+      let result = "";
+
+      numerals.forEach(([value, symbol]) => {
+        while (remaining >= value) {
+          result += symbol;
+          remaining -= value;
+        }
+      });
+
+      return result;
+    }
+
+    function toChineseNumber(number) {
+      const digits = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+
+      if (number <= 10) {
+        return number === 10 ? "十" : digits[number];
+      }
+
+      if (number < 20) {
+        return `十${digits[number % 10]}`;
+      }
+
+      if (number < 100) {
+        const tens = Math.floor(number / 10);
+        const ones = number % 10;
+        return `${digits[tens]}十${digits[ones]}`;
+      }
+
+      return String(number);
+    }
+
+    function splitGeneralText(text, criterion) {
+      const lines = [];
+      let buffer = "";
+
+      Array.from(text).forEach((character) => {
+        buffer += character;
+
+        if (character === criterion) {
+          const trimmed = buffer.trim();
+          if (trimmed && trimmed !== criterion) {
+            lines.push(trimmed);
+          }
+          buffer = "";
+        }
+      });
+
+      const remaining = buffer.trim();
+      if (remaining) {
+        lines.push(remaining);
+      }
+
+      return lines;
+    }
+
+    function formatGeneralLines(lines, style) {
+      return lines.map((line, index) => {
+        const number = index + 1;
+
+        if (style === "arabic") {
+          return `${number}. ${line}`;
+        }
+
+        if (style === "roman") {
+          return `${toRoman(number)}. ${line}`;
+        }
+
+        if (style === "chinese") {
+          return `${toChineseNumber(number)}. ${line}`;
+        }
+
+        if (style === "bullet") {
+          return `• ${line}`;
+        }
+
+        if (style === "check") {
+          return `✓ ${line}`;
+        }
+
+        return line;
+      });
+    }
+
+    function selectGeneralCriterion(criterion) {
+      selectedGeneralCriterion = criterion;
+      criterionButtons.forEach((button) => {
+        button.setAttribute("aria-pressed", button.dataset.criterion === criterion ? "true" : "false");
+      });
+      updateFieldActions();
+      setStatus(generalStatusText, generalSourceText.value.trim() ? i18n.ready : i18n.general_input_required, !generalSourceText.value.trim());
+    }
+
+    function processGeneralText() {
+      const text = generalSourceText.value.trim();
+
+      if (!selectedGeneralCriterion) {
+        setStatus(generalStatusText, i18n.criterion_required, true);
+        return;
+      }
+
+      if (!text) {
+        setStatus(generalStatusText, i18n.general_input_required, true);
+        return;
+      }
+
+      const lines = splitGeneralText(text, selectedGeneralCriterion);
+      const output = formatGeneralLines(lines, generalListStyle.value).join("\n");
+      generalResultText.textContent = output;
+      updateGeneralOutputMeta(output);
+      updateFieldActions();
+      setStatus(generalStatusText, i18n.general_processed);
     }
 
     async function postJson(url) {
@@ -775,26 +1085,43 @@
       updateFieldActions();
       setStatus(statusText, text ? i18n.lookup_used : i18n.lookup_empty, !text);
       if (text) {
-        activateTab("line-break-panel");
+        activateMainTab("line-break-panel");
       }
     }
 
     tabButtons.forEach((button) => {
-      button.addEventListener("click", () => activateTab(button.dataset.tabTarget));
+      button.addEventListener("click", () => activateMainTab(button.dataset.mainTabTarget));
+    });
+    lineBreakTabButtons.forEach((button) => {
+      button.addEventListener("click", () => activateLineBreakTab(button.dataset.lineBreakTabTarget));
+    });
+    criterionButtons.forEach((button) => {
+      button.addEventListener("click", () => selectGeneralCriterion(button.dataset.criterion));
     });
     sourceText.addEventListener("input", () => {
       updateInputMeta();
       updateFieldActions();
     });
     lookupInput.addEventListener("input", updateFieldActions);
+    generalSourceText.addEventListener("input", () => {
+      updateGeneralInputMeta();
+      updateFieldActions();
+    });
+    generalListStyle.addEventListener("change", () => {
+      if (isRealOutputText(generalResultText)) {
+        processGeneralText();
+      }
+    });
     document.getElementById("processBtn").addEventListener("click", processText);
     document.getElementById("docxBtn").addEventListener("click", () => downloadFile("/line-break/export_docx", "output.docx"));
     document.getElementById("pptxBtn").addEventListener("click", () => downloadFile("/line-break/export_ppt", "output.pptx"));
     document.getElementById("xlsxBtn").addEventListener("click", () => downloadFile("/line-break/export_xlsx", "output.xlsx"));
     document.getElementById("lookupBtn").addEventListener("click", lookupVerse);
     document.getElementById("useLookupBtn").addEventListener("click", useLookupInInput);
+    processGeneralBtn.addEventListener("click", processGeneralText);
     copyResultBtn.addEventListener("click", () => copyOutput(resultText));
     copyLookupBtn.addEventListener("click", () => copyOutput(lookupResult));
+    copyGeneralResultBtn.addEventListener("click", () => copyOutput(generalResultText));
     eraseSourceBtn.addEventListener("click", () => {
       eraseField(sourceText, {
         afterErase: updateInputMeta,
@@ -808,12 +1135,23 @@
       });
       clearOutput(lookupResult, updateLookupMeta);
     });
+    eraseGeneralSourceBtn.addEventListener("click", () => {
+      eraseField(generalSourceText, {
+        afterErase: updateGeneralInputMeta,
+        focus: true
+      });
+      clearOutput(generalResultText, updateGeneralOutputMeta);
+      setStatus(generalStatusText, selectedGeneralCriterion ? i18n.general_input_required : i18n.criterion_required, true);
+    });
 
     updateInputMeta();
     updateOutputMeta("");
     updateLookupMeta("");
+    updateGeneralInputMeta();
+    updateGeneralOutputMeta("");
     updateFieldActions();
-    activateTab("line-break-panel");
+    activateMainTab("line-break-panel");
+    activateLineBreakTab("bible-line-break-panel");
   </script>
 </body>
 </html>

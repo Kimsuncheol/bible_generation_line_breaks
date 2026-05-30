@@ -34,6 +34,19 @@ def test_client_page():
     assert '/bible/generate' in response.text
     assert 'Generate Bible Text' in response.text
     assert 'Output copied.' in response.text
+    assert 'Bible' in response.text
+    assert 'General Text' in response.text
+    assert 'id="general-line-break-panel"' in response.text
+    assert 'data-criterion="."' in response.text
+    assert 'data-criterion=","' in response.text
+    assert 'data-criterion="-"' in response.text
+    assert 'Arabic number' in response.text
+    assert 'Roman number' in response.text
+    assert 'Chinese number' in response.text
+    assert 'Bullet' in response.text
+    assert 'Check mark' in response.text
+    assert 'id="processGeneralBtn"' in response.text
+    assert 'id="copyGeneralResultBtn"' in response.text
     assert 'id="copyResultBtn"' in response.text
     assert 'id="copyLookupBtn"' in response.text
     assert 'id="eraseSourceBtn"' in response.text
@@ -48,7 +61,12 @@ def test_client_page_korean_query_locale():
     assert '<html lang="ko">' in response.text
     assert '줄바꿈 테스트 클라이언트' in response.text
     assert '성경 본문 생성' in response.text
+    assert '일반 텍스트' in response.text
+    assert '기준' in response.text
+    assert '아라비아 숫자' in response.text
+    assert '체크 표시' in response.text
     assert '처리된 출력 복사' in response.text
+    assert '일반 출력 복사' in response.text
     assert '출력이 복사되었습니다.' in response.text
     assert '/line-break/export_xlsx' in response.text
     assert '/bible/generate' in response.text
