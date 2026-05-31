@@ -252,12 +252,20 @@
 
     textarea,
     pre {
-      min-height: 360px;
+      height: 360px;
       margin: 0;
       padding: 18px 20px;
-      resize: vertical;
+      resize: none;
+      overflow: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
       white-space: pre-wrap;
       word-break: break-word;
+    }
+
+    textarea::-webkit-scrollbar,
+    pre::-webkit-scrollbar {
+      display: none;
     }
 
     .field-shell {
@@ -272,10 +280,6 @@
     .field-shell pre:empty::before {
       content: attr(data-placeholder);
       color: var(--muted);
-    }
-
-    .lookup-output {
-      min-height: 180px;
     }
 
     .field-actions {
@@ -428,7 +432,7 @@
 
       textarea,
       pre {
-        min-height: 260px;
+        height: 260px;
       }
 
       .option-grid {

@@ -53,6 +53,14 @@ def test_client_page():
     assert 'id="eraseLookupInputBtn"' in response.text
     assert 'id="eraseResultBtn"' not in response.text
     assert 'id="eraseLookupResultBtn"' not in response.text
+    assert 'height: 360px;' in response.text
+    assert 'height: 260px;' in response.text
+    assert 'resize: none;' in response.text
+    assert 'overflow: auto;' in response.text
+    assert 'scrollbar-width: none;' in response.text
+    assert '-ms-overflow-style: none;' in response.text
+    assert '::-webkit-scrollbar' in response.text
+    assert 'display: none;' in response.text
 
 
 def test_client_page_korean_query_locale():
