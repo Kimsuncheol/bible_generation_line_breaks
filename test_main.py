@@ -5,6 +5,7 @@ from urllib.error import URLError
 
 from fastapi.testclient import TestClient
 from pptx import Presentation
+from pptx.dml.color import RGBColor
 from docx import Document
 import openpyxl
 from main import app
@@ -417,6 +418,28 @@ class TestExportPPT:
         response = client.post('/line-break/export_ppt', json={'text': text})
         prs = Presentation(io.BytesIO(response.content))
         assert len(prs.slides) == 2
+
+    def test_font_size_and_name_applied(self):
+        response = client.post('/line-break/export_ppt', json={'text': '창1:1 태초에 하나님이'})
+        prs = Presentation(io.BytesIO(response.content))
+        run = prs.slides[0].shapes[0].text_frame.paragraphs[0].runs[0]
+        assert run.font.size.pt == 52
+        assert run.font.name == 'KoPubWorld바탕체 Bold'
+
+    def test_east_asian_font_applied(self):
+        from pptx.oxml.ns import qn
+        response = client.post('/line-break/export_ppt', json={'text': '창1:1 태초에 하나님이'})
+        prs = Presentation(io.BytesIO(response.content))
+        run = prs.slides[0].shapes[0].text_frame.paragraphs[0].runs[0]
+        ea = run.font._rPr.find(qn('a:ea'))
+        assert ea is not None
+        assert ea.get('typeface') == 'KoPubWorld바탕체 Bold'
+
+    def test_slide_background_color_applied(self):
+        response = client.post('/line-break/export_ppt', json={'text': '창1:1 태초에 하나님이'})
+        prs = Presentation(io.BytesIO(response.content))
+        background = prs.slides[0].background
+        assert background.fill.fore_color.rgb == RGBColor(0x20, 0x38, 0x64)
 
 
 # ── POST /line-break/export_docx ─────────────────────────────────────────────
