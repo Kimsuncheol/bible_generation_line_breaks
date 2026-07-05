@@ -441,6 +441,19 @@ class TestExportPPT:
         background = prs.slides[0].background
         assert background.fill.fore_color.rgb == RGBColor(0x20, 0x38, 0x64)
 
+    def test_font_color_applied(self):
+        response = client.post('/line-break/export_ppt', json={'text': '창1:1 태초에 하나님이'})
+        prs = Presentation(io.BytesIO(response.content))
+        run = prs.slides[0].shapes[0].text_frame.paragraphs[0].runs[0]
+        assert run.font.color.rgb == RGBColor(0xFF, 0xFF, 0xFF)
+
+    def test_slide_size_is_widescreen(self):
+        from pptx.util import Inches
+        response = client.post('/line-break/export_ppt', json={'text': '창1:1 태초에 하나님이'})
+        prs = Presentation(io.BytesIO(response.content))
+        assert prs.slide_width == Inches(13.333)
+        assert prs.slide_height == Inches(7.5)
+
 
 # ── POST /line-break/export_docx ─────────────────────────────────────────────
 

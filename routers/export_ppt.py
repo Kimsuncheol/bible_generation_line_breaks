@@ -13,7 +13,10 @@ router = APIRouter(prefix="/line-break/export_ppt", tags=["export"])
 
 FONT_NAME = "KoPubWorld바탕체 Bold"
 FONT_SIZE = Pt(52)
+FONT_COLOR = RGBColor(0xFF, 0xFF, 0xFF)
 BACKGROUND_COLOR = RGBColor(0x20, 0x38, 0x64)
+SLIDE_WIDTH = Inches(13.333)
+SLIDE_HEIGHT = Inches(7.5)
 
 
 def _set_east_asian_font(run, typeface):
@@ -36,6 +39,8 @@ def export_ppt(request: LineBreakRequest):
         blocks = [text.strip()]
 
     prs = Presentation()
+    prs.slide_width = SLIDE_WIDTH
+    prs.slide_height = SLIDE_HEIGHT
     blank_layout = prs.slide_layouts[6]
 
     for block in blocks:
@@ -43,7 +48,7 @@ def export_ppt(request: LineBreakRequest):
         slide.background.fill.solid()
         slide.background.fill.fore_color.rgb = BACKGROUND_COLOR
 
-        txBox = slide.shapes.add_textbox(Inches(0.5), Inches(0.5), Inches(9), Inches(6))
+        txBox = slide.shapes.add_textbox(Inches(0.5), Inches(0.5), SLIDE_WIDTH - Inches(1), Inches(6))
         tf = txBox.text_frame
         tf.word_wrap = True
 
@@ -54,6 +59,7 @@ def export_ppt(request: LineBreakRequest):
             run.text = line
             run.font.size = FONT_SIZE
             run.font.name = FONT_NAME
+            run.font.color.rgb = FONT_COLOR
             _set_east_asian_font(run, FONT_NAME)
 
     buf = io.BytesIO()
