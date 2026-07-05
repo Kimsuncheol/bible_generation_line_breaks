@@ -262,9 +262,22 @@ def normalize_korean_reference(reference: str) -> dict:
     }
 
 
+PARENTHETICAL_PATTERN = re.compile(r"\(([^()]+)\)")
+
+
+def _expand_parenthetical_line(line: str) -> list[str]:
+    matches = [match.strip() for match in PARENTHETICAL_PATTERN.findall(line)]
+    matches = [match for match in matches if match]
+    return matches or [line]
+
+
 def parse_reference_lines(text: str) -> tuple[int, list[dict]]:
     raw_lines = [line.strip() for line in text.splitlines()]
-    references = [line for line in raw_lines if line]
+    references = [
+        expanded
+        for line in raw_lines if line
+        for expanded in _expand_parenthetical_line(line)
+    ]
     seen = set()
     unique_references = []
 

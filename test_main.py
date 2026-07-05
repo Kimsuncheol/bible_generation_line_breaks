@@ -201,6 +201,21 @@ class TestBibleReferenceParsing:
         assert input_count == 3
         assert [item['display_reference'] for item in parsed] == ['마25:21', '계2:8-13']
 
+    def test_parse_reference_lines_extracts_single_parenthetical_reference(self):
+        input_count, parsed = parse_reference_lines('(고전15:58)')
+        assert input_count == 1
+        assert [item['display_reference'] for item in parsed] == ['고전15:58']
+
+    def test_parse_reference_lines_extracts_multiple_parenthetical_references(self):
+        input_count, parsed = parse_reference_lines('(고전15:58)\n(대상6:31-32)')
+        assert input_count == 2
+        assert [item['display_reference'] for item in parsed] == ['고전15:58', '대상6:31-32']
+
+    def test_parse_reference_lines_extracts_multiple_parens_on_one_line(self):
+        input_count, parsed = parse_reference_lines('(고전15:58) (대상6:31-32)')
+        assert input_count == 2
+        assert [item['display_reference'] for item in parsed] == ['고전15:58', '대상6:31-32']
+
 
 class TestBibleGeneration:
     @patch('utils.bible_api.fetch_bible_passage')
