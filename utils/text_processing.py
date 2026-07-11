@@ -16,3 +16,10 @@ def apply_line_break(text: str) -> str:
     # Step 2: insert \n between verse-ref number and Korean content
     result = re.sub(r'(^|\n)([가-힣]+\d+:\d+(?:-\d+)?)[ \t]+', r'\1\2\n', result)
     return result
+
+def apply_equals_line_break(text: str) -> str:
+    # Each non-blank source line becomes its own block (slide); within a
+    # block, break after every '=' since it marks the outline/answer boundary.
+    _, _, lines = inspect_line_breaks(text)
+    blocks = [re.sub(r'=', '=\n', line.strip()) for line in lines if line.strip()]
+    return '\n\n'.join(blocks)

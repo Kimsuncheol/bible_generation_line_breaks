@@ -10,7 +10,7 @@ from docx import Document
 import openpyxl
 from main import app
 from utils.bible_api import BibleAPIError, generate_bible_text, normalize_korean_reference, parse_reference_lines
-from utils.text_processing import inspect_line_breaks
+from utils.text_processing import apply_equals_line_break, inspect_line_breaks
 
 client = TestClient(app)
 
@@ -383,6 +383,60 @@ class TestLineBreak:
         assert '\n\n마20:8\n' in result
 
 
+# ── utils.text_processing.apply_equals_line_break ─────────────────────────────
+
+class TestApplyEqualsLineBreak:
+    def test_single_line_breaks_after_equals(self):
+        text = '첫째:생활가난때=생활부요믿어야(고후8:9)'
+        assert apply_equals_line_break(text) == (
+            '첫째:생활가난때=\n생활부요믿어야(고후8:9)'
+        )
+
+    def test_multiple_lines_become_separate_blocks(self):
+        text = (
+            '첫째:생활가난때=생활부요믿어야(고후8:9)\n'
+            '둘째:귀신역사때=귀신축귀믿어야(막16:16~17)'
+        )
+        assert apply_equals_line_break(text) == (
+            '첫째:생활가난때=\n생활부요믿어야(고후8:9)\n\n'
+            '둘째:귀신역사때=\n귀신축귀믿어야(막16:16~17)'
+        )
+
+    def test_multiple_equals_signs_each_break(self):
+        text = '가=나=다'
+        assert apply_equals_line_break(text) == '가=\n나=\n다'
+
+    def test_blank_lines_are_dropped(self):
+        text = '첫째:가난=부요(고후8:9)\n\n둘째:귀신=축귀(막16:17)'
+        assert apply_equals_line_break(text) == (
+            '첫째:가난=\n부요(고후8:9)\n\n둘째:귀신=\n축귀(막16:17)'
+        )
+
+    def test_line_without_equals_is_kept_as_is(self):
+        assert apply_equals_line_break('그냥 문장입니다') == '그냥 문장입니다'
+
+
+# ── POST /line-break/equals ────────────────────────────────────────────────────
+
+class TestLineBreakEquals:
+    def test_single_line(self):
+        response = client.post('/line-break/equals', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
+        assert response.status_code == 200
+        assert response.json()['result'] == '첫째:생활가난때=\n생활부요믿어야(고후8:9)'
+
+    def test_two_lines_produce_two_blocks(self):
+        text = (
+            '첫째:생활가난때=생활부요믿어야(고후8:9)\n'
+            '둘째:귀신역사때=귀신축귀믿어야(막16:16~17)'
+        )
+        response = client.post('/line-break/equals', json={'text': text})
+        assert response.status_code == 200
+        result = response.json()['result']
+        assert '첫째:생활가난때=\n생활부요믿어야(고후8:9)' in result
+        assert '둘째:귀신역사때=\n귀신축귀믿어야(막16:16~17)' in result
+        assert result.count('\n\n') == 1
+
+
 # ── POST /line-break/export_ppt ──────────────────────────────────────────────
 
 class TestExportPPT:
@@ -453,6 +507,130 @@ class TestExportPPT:
         prs = Presentation(io.BytesIO(response.content))
         assert prs.slide_width == Inches(13.333)
         assert prs.slide_height == Inches(7.5)
+
+
+# ── POST /line-break/equals/export_ppt ────────────────────────────────────────
+
+class TestExportPPTEquals:
+    def test_status_and_content_type(self):
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
+        assert response.status_code == 200
+        assert 'presentationml' in response.headers['content-type']
+
+    def test_content_disposition(self):
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
+        assert 'output.pptx' in response.headers['content-disposition']
+
+    def test_slide_text_content(self):
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
+        prs = Presentation(io.BytesIO(response.content))
+        all_text = '\n'.join(
+            shape.text_frame.text
+            for slide in prs.slides
+            for shape in slide.shapes
+            if shape.has_text_frame
+        )
+        assert '첫째:생활가난때=' in all_text
+        assert '생활부요믿어야(고후8:9)' in all_text
+
+    def test_each_input_line_produces_own_slide(self):
+        text = (
+            '첫째:생활가난때=생활부요믿어야(고후8:9)\n'
+            '둘째:귀신역사때=귀신축귀믿어야(막16:16~17)'
+        )
+        response = client.post('/line-break/equals/export_ppt', json={'text': text})
+        prs = Presentation(io.BytesIO(response.content))
+        assert len(prs.slides) == 2
+
+    def test_font_size_name_and_bold_applied(self):
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
+        prs = Presentation(io.BytesIO(response.content))
+        run = prs.slides[0].shapes[0].text_frame.paragraphs[0].runs[0]
+        assert run.font.size.pt == 60
+        assert run.font.name == '맑은 고딕'
+        assert run.font.bold is True
+
+    def test_east_asian_font_applied(self):
+        from pptx.oxml.ns import qn
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
+        prs = Presentation(io.BytesIO(response.content))
+        run = prs.slides[0].shapes[0].text_frame.paragraphs[0].runs[0]
+        ea = run.font._rPr.find(qn('a:ea'))
+        assert ea is not None
+        assert ea.get('typeface') == '맑은 고딕'
+
+    def test_slide_background_color_is_black(self):
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
+        prs = Presentation(io.BytesIO(response.content))
+        background = prs.slides[0].background
+        assert background.fill.fore_color.rgb == RGBColor(0x00, 0x00, 0x00)
+
+    def test_font_color_is_white(self):
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
+        prs = Presentation(io.BytesIO(response.content))
+        run = prs.slides[0].shapes[0].text_frame.paragraphs[0].runs[0]
+        assert run.font.color.rgb == RGBColor(0xFF, 0xFF, 0xFF)
+
+    def test_slide_size_is_widescreen(self):
+        from pptx.util import Inches
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
+        prs = Presentation(io.BytesIO(response.content))
+        assert prs.slide_width == Inches(13.333)
+        assert prs.slide_height == Inches(7.5)
+
+    def test_text_alignment_is_centered(self):
+        from pptx.enum.text import PP_ALIGN
+        text = (
+            '첫째:생활가난때=생활부요믿어야(고후8:9)\n'
+            '둘째:귀신역사때=귀신축귀믿어야(막16:16~17)'
+        )
+        response = client.post('/line-break/equals/export_ppt', json={'text': text})
+        prs = Presentation(io.BytesIO(response.content))
+        for slide in prs.slides:
+            for shape in slide.shapes:
+                if not shape.has_text_frame:
+                    continue
+                for paragraph in shape.text_frame.paragraphs:
+                    assert paragraph.alignment == PP_ALIGN.CENTER
+
+    def test_text_box_is_centered_in_slide(self):
+        from pptx.enum.text import MSO_ANCHOR
+        from pptx.util import Inches
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
+        prs = Presentation(io.BytesIO(response.content))
+        shape = prs.slides[0].shapes[0]
+        assert shape.text_frame.vertical_anchor == MSO_ANCHOR.MIDDLE
+        left_margin = shape.left
+        right_margin = prs.slide_width - (shape.left + shape.width)
+        top_margin = shape.top
+        bottom_margin = prs.slide_height - (shape.top + shape.height)
+        assert left_margin == right_margin
+        assert top_margin == bottom_margin
+
+    def test_align_defaults_to_center(self):
+        from pptx.enum.text import PP_ALIGN
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
+        prs = Presentation(io.BytesIO(response.content))
+        run = prs.slides[0].shapes[0].text_frame.paragraphs[0]
+        assert run.alignment == PP_ALIGN.CENTER
+
+    def test_align_left(self):
+        from pptx.enum.text import PP_ALIGN
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)', 'align': 'left'})
+        prs = Presentation(io.BytesIO(response.content))
+        paragraph = prs.slides[0].shapes[0].text_frame.paragraphs[0]
+        assert paragraph.alignment == PP_ALIGN.LEFT
+
+    def test_align_right(self):
+        from pptx.enum.text import PP_ALIGN
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)', 'align': 'right'})
+        prs = Presentation(io.BytesIO(response.content))
+        paragraph = prs.slides[0].shapes[0].text_frame.paragraphs[0]
+        assert paragraph.alignment == PP_ALIGN.RIGHT
+
+    def test_align_invalid_value_rejected(self):
+        response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)', 'align': 'justify'})
+        assert response.status_code == 422
 
 
 # ── POST /line-break/export_docx ─────────────────────────────────────────────

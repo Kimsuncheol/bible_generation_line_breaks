@@ -3,25 +3,32 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pptx import Presentation
 from pptx.dml.color import RGBColor
+from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Inches, Pt
-from schemas.line_break import LineBreakRequest
+from schemas.line_break import LineBreakEqualsExportRequest
 from utils.pptx_helpers import set_east_asian_font
-from utils.text_processing import apply_line_break, inspect_line_breaks
+from utils.text_processing import apply_equals_line_break
 
-router = APIRouter(prefix="/line-break/export_ppt", tags=["export"])
+router = APIRouter(prefix="/line-break/equals/export_ppt", tags=["export"])
 
-FONT_NAME = "KoPubWorld바탕체 Bold"
-FONT_SIZE = Pt(52)
+FONT_NAME = "맑은 고딕"
+FONT_SIZE = Pt(60)
 FONT_COLOR = RGBColor(0xFF, 0xFF, 0xFF)
-BACKGROUND_COLOR = RGBColor(0x20, 0x38, 0x64)
+BACKGROUND_COLOR = RGBColor(0x00, 0x00, 0x00)
 SLIDE_WIDTH = Inches(13.333)
 SLIDE_HEIGHT = Inches(7.5)
 
+ALIGN_MAP = {
+    "left": PP_ALIGN.LEFT,
+    "center": PP_ALIGN.CENTER,
+    "right": PP_ALIGN.RIGHT,
+}
+
 
 @router.post('')
-def export_ppt(request: LineBreakRequest):
-    text = apply_line_break(request.text)
-    text, _, _ = inspect_line_breaks(text)
+def export_ppt_equals(request: LineBreakEqualsExportRequest):
+    align = ALIGN_MAP[request.align]
+    text = apply_equals_line_break(request.text)
     blocks = [b.strip() for b in text.split('\n\n') if b.strip()]
     if not blocks:
         blocks = [text.strip()]
@@ -36,17 +43,20 @@ def export_ppt(request: LineBreakRequest):
         slide.background.fill.solid()
         slide.background.fill.fore_color.rgb = BACKGROUND_COLOR
 
-        txBox = slide.shapes.add_textbox(Inches(0.5), Inches(0.5), SLIDE_WIDTH - Inches(1), Inches(6))
+        txBox = slide.shapes.add_textbox(Inches(0.5), Inches(0.5), SLIDE_WIDTH - Inches(1), SLIDE_HEIGHT - Inches(1))
         tf = txBox.text_frame
         tf.word_wrap = True
+        tf.vertical_anchor = MSO_ANCHOR.MIDDLE
 
         lines = block.split('\n')
         for i, line in enumerate(lines):
             p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+            p.alignment = align
             run = p.add_run()
             run.text = line
             run.font.size = FONT_SIZE
             run.font.name = FONT_NAME
+            run.font.bold = True
             run.font.color.rgb = FONT_COLOR
             set_east_asian_font(run, FONT_NAME)
 

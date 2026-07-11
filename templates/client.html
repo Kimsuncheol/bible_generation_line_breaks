@@ -355,6 +355,12 @@
       font: 700 1.05rem/1 "Avenir Next", "Segoe UI", sans-serif;
     }
 
+    .align-button {
+      width: auto;
+      padding: 0 16px;
+      font: 600 0.85rem/1 "Avenir Next", "Segoe UI", sans-serif;
+    }
+
     .criterion-button[aria-pressed="true"] {
       background: var(--accent);
       border-color: var(--accent);
@@ -472,6 +478,7 @@
       <nav class="subtabs" aria-label="{{ _('Line Break Modes') }}">
         <button class="subtab-button" type="button" data-line-break-tab-target="bible-line-break-panel" aria-selected="true">{{ _("Bible") }}</button>
         <button class="subtab-button" type="button" data-line-break-tab-target="general-line-break-panel" aria-selected="false">{{ _("General Text") }}</button>
+        <button class="subtab-button" type="button" data-line-break-tab-target="equals-line-break-panel" aria-selected="false">{{ _("Outline (=)") }}</button>
       </nav>
 
       <div class="subtab-panel is-active" id="bible-line-break-panel">
@@ -595,6 +602,66 @@
           </section>
         </div>
       </div>
+
+      <div class="subtab-panel" id="equals-line-break-panel">
+        <div class="tool-grid">
+        <section class="panel">
+          <div class="meta-row">
+            <span>{{ _("Input Text") }}</span>
+            <span id="equalsInputMeta">0 {{ _("chars") }}</span>
+          </div>
+          <div class="field-shell">
+            <textarea id="equalsSourceText" spellcheck="false" placeholder="첫째:생활가난때=생활부요믿어야(고후8:9)&#10;둘째:귀신역사때=귀신축귀믿어야(막16:16~17)"></textarea>
+            <div class="field-actions" id="equalsSourceActions" hidden>
+              <button class="field-icon-button eraser-button" id="eraseEqualsSourceBtn" type="button" aria-label="{{ _('Clear input text') }}" title="{{ _('Clear input text') }}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m7 21-4-4L14 6l4 4L7 21Z"></path>
+                  <path d="m14 6 3-3 4 4-3 3"></path>
+                  <path d="M5 19h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-top: 18px;">
+            <label class="field-label">{{ _("Text Alignment") }}</label>
+            <div class="segmented-control" role="group" aria-label="{{ _('Text Alignment') }}" id="equalsAlignControl">
+              <button class="criterion-button align-button" type="button" data-align="left" aria-pressed="false">{{ _("Left") }}</button>
+              <button class="criterion-button align-button" type="button" data-align="center" aria-pressed="true">{{ _("Center") }}</button>
+              <button class="criterion-button align-button" type="button" data-align="right" aria-pressed="false">{{ _("Right") }}</button>
+            </div>
+          </div>
+
+          <div class="controls" style="margin-top: 18px;">
+            <button class="primary" id="equalsProcessBtn" type="button">{{ _("Process Text") }}</button>
+            <button class="secondary" id="equalsPptxBtn" type="button">{{ _("Download PPTX") }}</button>
+          </div>
+
+          <div class="status" id="equalsStatusText" style="margin-top: 16px;">{{ _("Ready.") }}</div>
+          <p class="hint" style="margin-top: 14px;">
+            {{ _("Each input line becomes one slide; the line breaks right after every '=' sign.") }}
+          </p>
+        </section>
+
+        <section class="panel">
+          <div class="meta-row">
+            <span>{{ _("Processed Output") }}</span>
+            <span id="equalsOutputMeta">0 {{ _("lines") }}</span>
+          </div>
+          <div class="field-shell has-copy">
+            <pre id="equalsResultText" data-placeholder="{{ _('Processed text will appear here.') }}"></pre>
+            <div class="field-actions" id="equalsResultActions" hidden>
+              <button class="field-icon-button copy-output-button" id="copyEqualsResultBtn" type="button" aria-label="{{ _('Copy processed output') }}" title="{{ _('Copy processed output') }}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+        </div>
+      </div>
     </section>
 
     <section class="section tab-panel" id="bible-lookup-panel">
@@ -686,12 +753,20 @@
     const generalListStyle = document.getElementById("generalListStyle");
     const processGeneralBtn = document.getElementById("processGeneralBtn");
 
+    const equalsSourceText = document.getElementById("equalsSourceText");
+    const equalsResultText = document.getElementById("equalsResultText");
+    const equalsInputMeta = document.getElementById("equalsInputMeta");
+    const equalsOutputMeta = document.getElementById("equalsOutputMeta");
+    const equalsStatusText = document.getElementById("equalsStatusText");
+
     const copyResultBtn = document.getElementById("copyResultBtn");
     const copyLookupBtn = document.getElementById("copyLookupBtn");
     const copyGeneralResultBtn = document.getElementById("copyGeneralResultBtn");
+    const copyEqualsResultBtn = document.getElementById("copyEqualsResultBtn");
     const eraseSourceBtn = document.getElementById("eraseSourceBtn");
     const eraseLookupInputBtn = document.getElementById("eraseLookupInputBtn");
     const eraseGeneralSourceBtn = document.getElementById("eraseGeneralSourceBtn");
+    const eraseEqualsSourceBtn = document.getElementById("eraseEqualsSourceBtn");
 
     const sourceActions = document.getElementById("sourceActions");
     const resultActions = document.getElementById("resultActions");
@@ -699,10 +774,15 @@
     const lookupResultActions = document.getElementById("lookupResultActions");
     const generalSourceActions = document.getElementById("generalSourceActions");
     const generalResultActions = document.getElementById("generalResultActions");
+    const equalsSourceActions = document.getElementById("equalsSourceActions");
+    const equalsResultActions = document.getElementById("equalsResultActions");
 
     const lineBreakButtons = Array.from(document.querySelectorAll("#processBtn, #docxBtn, #pptxBtn, #xlsxBtn"));
     const lookupButtons = Array.from(document.querySelectorAll("#lookupBtn, #useLookupBtn"));
+    const equalsButtons = Array.from(document.querySelectorAll("#equalsProcessBtn, #equalsPptxBtn"));
+    const equalsAlignButtons = Array.from(document.querySelectorAll("#equalsAlignControl [data-align]"));
     let selectedGeneralCriterion = "";
+    let selectedEqualsAlign = "center";
 
     function activateMainTab(targetId) {
       tabButtons.forEach((button) => {
@@ -767,6 +847,14 @@
       generalOutputMeta.textContent = `${lineCount(text)} ${i18n.lines_suffix}`;
     }
 
+    function updateEqualsInputMeta() {
+      equalsInputMeta.textContent = `${equalsSourceText.value.length} ${i18n.chars_suffix}`;
+    }
+
+    function updateEqualsOutputMeta(text) {
+      equalsOutputMeta.textContent = `${lineCount(text)} ${i18n.lines_suffix}`;
+    }
+
     function isRealOutputText(target) {
       const text = target.textContent.trim();
       const placeholder = (target.dataset.placeholder || "").trim();
@@ -782,6 +870,8 @@
       generalResultActions.hidden = !isRealOutputText(generalResultText);
       generalListStyle.disabled = !selectedGeneralCriterion;
       processGeneralBtn.disabled = !(selectedGeneralCriterion && generalSourceText.value.trim());
+      equalsSourceActions.hidden = !equalsSourceText.value.trim();
+      equalsResultActions.hidden = !isRealOutputText(equalsResultText);
     }
 
     function showCopyAlert(message, icon = "success") {
@@ -970,6 +1060,13 @@
       setStatus(generalStatusText, generalSourceText.value.trim() ? i18n.ready : i18n.general_input_required, !generalSourceText.value.trim());
     }
 
+    function selectEqualsAlign(align) {
+      selectedEqualsAlign = align;
+      equalsAlignButtons.forEach((button) => {
+        button.setAttribute("aria-pressed", button.dataset.align === align ? "true" : "false");
+      });
+    }
+
     function processGeneralText() {
       const text = generalSourceText.value.trim();
 
@@ -991,13 +1088,13 @@
       setStatus(generalStatusText, i18n.general_processed);
     }
 
-    async function postJson(url) {
+    async function postJsonWithBody(url, body) {
       const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ text: sourceText.value })
+        body: JSON.stringify(body)
       });
 
       if (!response.ok) {
@@ -1005,6 +1102,14 @@
       }
 
       return response;
+    }
+
+    async function postJsonWithText(url, text) {
+      return postJsonWithBody(url, { text });
+    }
+
+    async function postJson(url) {
+      return postJsonWithText(url, sourceText.value);
     }
 
     async function processText() {
@@ -1045,6 +1150,47 @@
         setStatus(statusText, error.message, true);
       } finally {
         setBusy(lineBreakButtons, false);
+      }
+    }
+
+    async function processEqualsText() {
+      setBusy(equalsButtons, true);
+      setStatus(equalsStatusText, i18n.processing);
+
+      try {
+        const response = await postJsonWithText("/line-break/equals", equalsSourceText.value);
+        const data = await response.json();
+        equalsResultText.textContent = data.result || "";
+        updateEqualsOutputMeta(data.result || "");
+        updateFieldActions();
+        setStatus(equalsStatusText, i18n.processed);
+      } catch (error) {
+        setStatus(equalsStatusText, error.message, true);
+      } finally {
+        setBusy(equalsButtons, false);
+      }
+    }
+
+    async function downloadEqualsFile(url, filename) {
+      setBusy(equalsButtons, true);
+      setStatus(equalsStatusText, formatMessage(i18n.preparing, { filename }));
+
+      try {
+        const response = await postJsonWithBody(url, { text: equalsSourceText.value, align: selectedEqualsAlign });
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = objectUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(objectUrl);
+        setStatus(equalsStatusText, formatMessage(i18n.downloaded, { filename }));
+      } catch (error) {
+        setStatus(equalsStatusText, error.message, true);
+      } finally {
+        setBusy(equalsButtons, false);
       }
     }
 
@@ -1117,6 +1263,13 @@
         processGeneralText();
       }
     });
+    equalsSourceText.addEventListener("input", () => {
+      updateEqualsInputMeta();
+      updateFieldActions();
+    });
+    equalsAlignButtons.forEach((button) => {
+      button.addEventListener("click", () => selectEqualsAlign(button.dataset.align));
+    });
     document.getElementById("processBtn").addEventListener("click", processText);
     document.getElementById("docxBtn").addEventListener("click", () => downloadFile("/line-break/export_docx", "output.docx"));
     document.getElementById("pptxBtn").addEventListener("click", () => downloadFile("/line-break/export_ppt", "output.pptx"));
@@ -1124,9 +1277,12 @@
     document.getElementById("lookupBtn").addEventListener("click", lookupVerse);
     document.getElementById("useLookupBtn").addEventListener("click", useLookupInInput);
     processGeneralBtn.addEventListener("click", processGeneralText);
+    document.getElementById("equalsProcessBtn").addEventListener("click", processEqualsText);
+    document.getElementById("equalsPptxBtn").addEventListener("click", () => downloadEqualsFile("/line-break/equals/export_ppt", "output.pptx"));
     copyResultBtn.addEventListener("click", () => copyOutput(resultText));
     copyLookupBtn.addEventListener("click", () => copyOutput(lookupResult));
     copyGeneralResultBtn.addEventListener("click", () => copyOutput(generalResultText));
+    copyEqualsResultBtn.addEventListener("click", () => copyOutput(equalsResultText));
     eraseSourceBtn.addEventListener("click", () => {
       eraseField(sourceText, {
         afterErase: updateInputMeta,
@@ -1148,12 +1304,21 @@
       clearOutput(generalResultText, updateGeneralOutputMeta);
       setStatus(generalStatusText, selectedGeneralCriterion ? i18n.general_input_required : i18n.criterion_required, true);
     });
+    eraseEqualsSourceBtn.addEventListener("click", () => {
+      eraseField(equalsSourceText, {
+        afterErase: updateEqualsInputMeta,
+        focus: true
+      });
+      clearOutput(equalsResultText, updateEqualsOutputMeta);
+    });
 
     updateInputMeta();
     updateOutputMeta("");
     updateLookupMeta("");
     updateGeneralInputMeta();
     updateGeneralOutputMeta("");
+    updateEqualsInputMeta();
+    updateEqualsOutputMeta("");
     updateFieldActions();
     activateMainTab("line-break-panel");
     activateLineBreakTab("bible-line-break-panel");
