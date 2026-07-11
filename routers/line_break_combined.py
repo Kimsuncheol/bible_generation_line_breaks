@@ -7,5 +7,5 @@ router = APIRouter(prefix="/line-break/combined", tags=["line-break"])
 @router.post('')
 def line_break_combined(request: LineBreakRequest):
     entries = apply_combined_line_break(request.text)
-    result = '\n\n'.join(content for _, content in entries)
+    result = '\n\n\n'.join('\n\n'.join(parts) for _, parts in entries)
     return {'result': result}

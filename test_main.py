@@ -639,13 +639,13 @@ class TestExportPPTEquals:
 class TestApplyCombinedLineBreak:
     def test_equals_line_is_classified_equals(self):
         entries = apply_combined_line_break('첫째:날마다=그리스도말씀들어야(롬10:17)')
-        assert entries == [('equals', '첫째:날마다=\n그리스도말씀들어야(롬10:17)')]
+        assert entries == [('equals', ['첫째:날마다=\n그리스도말씀들어야(롬10:17)'])]
 
     def test_bible_line_is_classified_bible(self):
         text = '롬10:17 그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라'
         entries = apply_combined_line_break(text)
         assert entries == [
-            ('bible', '롬10:17\n그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라')
+            ('bible', ['롬10:17\n그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라'])
         ]
 
     def test_mixed_lines_preserve_order_and_kind(self):
@@ -655,8 +655,8 @@ class TestApplyCombinedLineBreak:
         )
         entries = apply_combined_line_break(text)
         assert entries == [
-            ('equals', '첫째:날마다=\n그리스도말씀들어야(롬10:17)'),
-            ('bible', '롬10:17\n그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라'),
+            ('equals', ['첫째:날마다=\n그리스도말씀들어야(롬10:17)']),
+            ('bible', ['롬10:17\n그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라']),
         ]
 
     def test_blank_lines_are_dropped(self):
@@ -664,8 +664,99 @@ class TestApplyCombinedLineBreak:
         entries = apply_combined_line_break(text)
         assert len(entries) == 2
 
+    def test_verses_listed_before_outline_are_reordered_next_to_citation(self):
+        # Bible verses pasted up front, outline written after: the outline
+        # entry must be paired with its cited verse, not left in place.
+        text = (
+            '고후8:9 우리 주 예수 그리스도의 은혜를 너희가 알거니와\n\n'
+            '첫째:생활가난때=생활부요믿어야(고후8:9)'
+        )
+        entries = apply_combined_line_break(text)
+        assert entries == [
+            ('equals', ['첫째:생활가난때=\n생활부요믿어야(고후8:9)']),
+            ('bible', ['고후8:9\n우리 주 예수 그리스도의 은혜를 너희가 알거니와']),
+        ]
+
+    def test_multi_verse_group_single_blank_line_stays_together_as_separate_parts(self):
+        text = (
+            '막16:16 믿고 세례를 받는 사람은 구원을 얻을 것이요\n\n'
+            '막16:17 믿는 자들에게는 이런 표적이 따르리니\n\n'
+            '둘째:귀신역사때=귀신축귀믿어야(막16:16~17)'
+        )
+        entries = apply_combined_line_break(text)
+        assert entries == [
+            ('equals', ['둘째:귀신역사때=\n귀신축귀믿어야(막16:16~17)']),
+            ('bible', [
+                '막16:16\n믿고 세례를 받는 사람은 구원을 얻을 것이요',
+                '막16:17\n믿는 자들에게는 이런 표적이 따르리니',
+            ]),
+        ]
+
+    def test_double_blank_line_starts_a_new_verse_group(self):
+        text = (
+            '막16:16 믿고 세례를 받는 사람은 구원을 얻을 것이요\n\n\n'
+            '막16:17 믿는 자들에게는 이런 표적이 따르리니'
+        )
+        entries = apply_combined_line_break(text)
+        assert entries == [
+            ('bible', ['막16:16\n믿고 세례를 받는 사람은 구원을 얻을 것이요']),
+            ('bible', ['막16:17\n믿는 자들에게는 이런 표적이 따르리니']),
+        ]
+
+    def test_header_lines_are_dropped(self):
+        text = (
+            '♡본론\n'
+            '첫째:생활가난때=생활부요믿어야(고후8:9)\n'
+            '♡결론\n'
+            '둘째:날마다=성령충만해야(엡5:16)'
+        )
+        entries = apply_combined_line_break(text)
+        assert entries == [
+            ('equals', ['첫째:생활가난때=\n생활부요믿어야(고후8:9)']),
+            ('equals', ['둘째:날마다=\n성령충만해야(엡5:16)']),
+        ]
+
+    def test_unmatched_citation_yields_equals_only(self):
+        entries = apply_combined_line_break('첫째:생활가난때=생활부요믿어야(고후8:9)')
+        assert entries == [('equals', ['첫째:생활가난때=\n생활부요믿어야(고후8:9)'])]
+
 
 # ── POST /line-break/combined ──────────────────────────────────────────────────
+
+SERMON_TEXT = (
+    '고후8:9 우리 주 예수 그리스도의 은혜를 너희가 알거니와 부요하신 이로서 너희를 위하여 가난하게 되심은 그의 가난함으로 말미암아 너희를 부요하게 하려 하심이라\n'
+    '\n\n'
+    '막16:16 믿고 세례를 받는 사람은 구원을 얻을 것이요 믿지 않는 사람은 정죄를 받으리라\n'
+    '\n'
+    '막16:17 믿는 자들에게는 이런 표적이 따르리니 곧 그들이 내 이름으로 귀신을 쫓아내며 새 방언을 말하며\n'
+    '\n\n'
+    '요16:33 이것을 너희에게 이르는 것은 너희로 내 안에서 평안을 누리게 하려 함이라 세상에서는 너희가 환난을 당하나 담대하라 내가 세상을 이기었노라\n'
+    '\n\n'
+    '막11:24 그러므로 내가 너희에게 말하노니 무엇이든지 기도하고 구하는 것은 받은 줄로 믿으라 그리하면 너희에게 그대로 되리라\n'
+    '\n\n'
+    '롬10:17 그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라\n'
+    '\n\n'
+    '엡5:16 세월을 아끼라 때가 악하니라\n'
+    '\n'
+    '엡5:17 그러므로 어리석은 자가 되지 말고 오직 주의 뜻이 무엇인가 이해하라\n'
+    '\n'
+    '엡5:18 술 취하지 말라 이는 방탕한 것이니 오직 성령으로 충만함을 받으라\n'
+    '\n\n'
+    '마4:10 이에 예수께서 말씀하시되 사탄아 물러가라 기록되었으되 주 너의 하나님께 경배하고 다만 그를 섬기라 하였느니라\n'
+    '\n'
+    '마4:11 이에 마귀는 예수를 떠나고 천사들이 나아와서 수종드니라\n'
+    '\n'
+    '♡본론\n'
+    '첫째:생활가난때=생활부요믿어야(고후8:9)\n'
+    '둘째:귀신역사때=귀신축귀믿어야(막16:16~17)\n'
+    '셋째:환난인생때=환난이김믿어야(요16:33)\n'
+    '넷째:기도간청때=기도응답믿어야(막11:24)\n'
+    '♡결론\n'
+    '첫째:날마다=그리스도말씀들어야(롬10:17)\n'
+    '둘째:날마다=성령님으로충만해야(엡5:16~18)\n'
+    '셋째:날마다=믿음의적사탄을대적(마4:10~11)'
+)
+
 
 class TestLineBreakCombined:
     def test_mixed_input(self):
@@ -679,6 +770,35 @@ class TestLineBreakCombined:
         assert '첫째:날마다=\n그리스도말씀들어야(롬10:17)' in result
         assert '롬10:17\n그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라' in result
         assert result.count('\n\n') == 1
+
+    def test_sermon_manuscript_reorders_verses_next_to_their_outline_point(self):
+        response = client.post('/line-break/combined', json={'text': SERMON_TEXT})
+        assert response.status_code == 200
+        result = response.json()['result']
+
+        assert '♡본론' not in result
+        assert '♡결론' not in result
+
+        assert (
+            '첫째:생활가난때=\n생활부요믿어야(고후8:9)\n\n\n'
+            '고후8:9\n우리 주 예수 그리스도의 은혜를 너희가 알거니와 부요하신 이로서 너희를 위하여 가난하게 되심은 그의 가난함으로 말미암아 너희를 부요하게 하려 하심이라'
+        ) in result
+        assert (
+            '둘째:귀신역사때=\n귀신축귀믿어야(막16:16~17)\n\n\n'
+            '막16:16\n믿고 세례를 받는 사람은 구원을 얻을 것이요 믿지 않는 사람은 정죄를 받으리라\n\n'
+            '막16:17\n믿는 자들에게는 이런 표적이 따르리니 곧 그들이 내 이름으로 귀신을 쫓아내며 새 방언을 말하며'
+        ) in result
+        assert (
+            '둘째:날마다=\n성령님으로충만해야(엡5:16~18)\n\n\n'
+            '엡5:16\n세월을 아끼라 때가 악하니라\n\n'
+            '엡5:17\n그러므로 어리석은 자가 되지 말고 오직 주의 뜻이 무엇인가 이해하라\n\n'
+            '엡5:18\n술 취하지 말라 이는 방탕한 것이니 오직 성령으로 충만함을 받으라'
+        ) in result
+
+        # Order: each outline point immediately precedes its own cited verse(s).
+        assert result.index('첫째:생활가난때=') < result.index('고후8:9')
+        assert result.index('고후8:9') < result.index('둘째:귀신역사때=')
+        assert result.index('셋째:날마다=') < result.index('마4:10')
 
 
 # ── POST /line-break/combined/export_ppt ──────────────────────────────────────
@@ -733,6 +853,45 @@ class TestExportPPTCombined:
         prs = Presentation(io.BytesIO(response.content))
         assert prs.slides[0].shapes[0].text_frame.paragraphs[0].alignment == PP_ALIGN.LEFT
         assert prs.slides[1].shapes[0].text_frame.paragraphs[0].alignment is None
+
+    def test_sermon_manuscript_gives_every_verse_its_own_slide(self):
+        # Multi-verse citations (막16:16~17, 엡5:16~18, 마4:10~11) must each
+        # expand into one slide per verse rather than sharing a single slide.
+        response = client.post('/line-break/combined/export_ppt', json={'text': SERMON_TEXT})
+        prs = Presentation(io.BytesIO(response.content))
+        assert len(prs.slides) == 18
+
+        expected_kind_and_text = [
+            ('equals', '첫째:생활가난때='),
+            ('bible', '고후8:9'),
+            ('equals', '둘째:귀신역사때='),
+            ('bible', '막16:16'),
+            ('bible', '막16:17'),
+            ('equals', '셋째:환난인생때='),
+            ('bible', '요16:33'),
+            ('equals', '넷째:기도간청때='),
+            ('bible', '막11:24'),
+            ('equals', '첫째:날마다='),
+            ('bible', '롬10:17'),
+            ('equals', '둘째:날마다='),
+            ('bible', '엡5:16'),
+            ('bible', '엡5:17'),
+            ('bible', '엡5:18'),
+            ('equals', '셋째:날마다='),
+            ('bible', '마4:10'),
+            ('bible', '마4:11'),
+        ]
+        bible_bg = RGBColor(0x20, 0x38, 0x64)
+        equals_bg = RGBColor(0x00, 0x00, 0x00)
+
+        for slide, (kind, expected_prefix) in zip(prs.slides, expected_kind_and_text):
+            shape = slide.shapes[0]
+            assert shape.text_frame.text.startswith(expected_prefix)
+            expected_bg = equals_bg if kind == 'equals' else bible_bg
+            assert slide.background.fill.fore_color.rgb == expected_bg
+            # A bible slide holds exactly one verse now, not a bundled group.
+            if kind == 'bible':
+                assert shape.text_frame.text.count('\n\n') == 0
 
 
 # ── POST /line-break/export_docx ─────────────────────────────────────────────

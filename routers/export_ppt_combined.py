@@ -21,15 +21,18 @@ ALIGN_MAP = {
 @router.post('')
 def export_ppt_combined(request: LineBreakEqualsExportRequest):
     entries = apply_combined_line_break(request.text)
-    if not entries:
-        entries = [('equals', request.text.strip())]
+    # Each part is its own slide: an outline entry is always one slide, but a
+    # multi-verse citation (e.g. '막16:16~17') expands into one slide per verse.
+    slides = [(kind, part) for kind, parts in entries for part in parts]
+    if not slides:
+        slides = [('equals', request.text.strip())]
 
     prs = Presentation()
     prs.slide_width = SLIDE_WIDTH
     prs.slide_height = SLIDE_HEIGHT
     blank_layout = prs.slide_layouts[6]
 
-    for kind, block in entries:
+    for kind, block in slides:
         style = EQUALS_STYLE if kind == 'equals' else BIBLE_STYLE
 
         slide = prs.slides.add_slide(blank_layout)

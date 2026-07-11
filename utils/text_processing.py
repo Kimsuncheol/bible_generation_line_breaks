@@ -25,17 +25,102 @@ def apply_equals_line_break(text: str) -> str:
     return '\n\n'.join(blocks)
 
 BIBLE_LINE_PATTERN = re.compile(r'^([가-힣]+\d+:\d+(?:-\d+)?)[ \t]+(.+)$')
+REF_PARTS_PATTERN = re.compile(r'^([가-힣]+)(\d+):(\d+)')
+CITATION_PATTERN = re.compile(r'\(([^()]+)\)\s*$')
 
-def classify_combined_line(line: str) -> tuple[str, str]:
-    # A line is 'bible' when it starts with a verse reference (e.g. '롬10:17
-    # ...'); anything else (e.g. an outline line using '=') is 'equals'.
-    match = BIBLE_LINE_PATTERN.match(line.strip())
-    if match:
-        return 'bible', f'{match.group(1)}\n{match.group(2)}'
-    return 'equals', re.sub(r'=', '=\n', line.strip())
+def _group_citation_key(group: list[tuple[str, str]]) -> str | None:
+    # Mirrors how an outline line cites a range, e.g. a 막16:16 + 막16:17
+    # group is cited as '막16:16~17'; a single-verse group as '고후8:9'.
+    first_match = REF_PARTS_PATTERN.match(group[0][0])
+    if not first_match:
+        return None
+    book, chapter, first_verse = first_match.group(1), first_match.group(2), first_match.group(3)
+    if len(group) == 1:
+        return f'{book}{chapter}:{first_verse}'
+    last_match = REF_PARTS_PATTERN.match(group[-1][0])
+    last_verse = last_match.group(3) if last_match else first_verse
+    return f'{book}{chapter}:{first_verse}~{last_verse}'
 
-def apply_combined_line_break(text: str) -> list[tuple[str, str]]:
-    # Each non-blank source line becomes its own slide/block, classified and
-    # broken independently so Bible verses and '=' outline lines can mix.
+def _format_bible_group(group: list[tuple[str, str]]) -> list[str]:
+    # One string per verse: verses cited together (e.g. '막16:16~17') stay
+    # adjacent in text output but still become separate slides in PPT export.
+    return [f'{ref}\n{content}' for ref, content in group]
+
+def apply_combined_line_break(text: str) -> list[tuple[str, list[str]]]:
+    # Parses the whole document into ordered 'bible' verse groups (consecutive
+    # verse lines separated by at most one blank line) and '=' outline lines;
+    # any other non-blank line (e.g. a '♡본론' section header) is dropped.
+    # Each returned entry's parts list holds one string per resulting slide;
+    # callers that want flat text should join a bible entry's parts with a
+    # single blank line and join entries themselves with a wider gap.
     _, _, lines = inspect_line_breaks(text)
-    return [classify_combined_line(line) for line in lines if line.strip()]
+
+    raw_items: list[tuple[str, object]] = []
+    current_group: list[tuple[str, str]] = []
+    blank_run = 0
+
+    def flush_group():
+        nonlocal current_group
+        if current_group:
+            raw_items.append(('bible', current_group))
+            current_group = []
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            blank_run += 1
+            continue
+
+        bible_match = BIBLE_LINE_PATTERN.match(stripped)
+        if bible_match:
+            if current_group and blank_run <= 1:
+                current_group.append((bible_match.group(1), bible_match.group(2)))
+            else:
+                flush_group()
+                current_group = [(bible_match.group(1), bible_match.group(2))]
+            blank_run = 0
+            continue
+
+        flush_group()
+        blank_run = 0
+        if '=' in stripped:
+            raw_items.append(('outline', stripped))
+        # else: a header/noise line (e.g. '♡본론'), dropped.
+
+    flush_group()
+
+    # Outline lines cite a verse (range) by its trailing '(...)'; resolve each
+    # citation to its bible group up front so we can suppress duplicates when
+    # the group's own position is later re-visited during emission.
+    groups_by_key: dict[str, list[tuple[str, object]]] = {}
+    for item in raw_items:
+        if item[0] == 'bible':
+            key = _group_citation_key(item[1])
+            if key:
+                groups_by_key.setdefault(key, []).append(item)
+
+    consumed_ids = set()
+    outline_pairs = {}
+    for item in raw_items:
+        if item[0] != 'outline':
+            continue
+        citation_match = CITATION_PATTERN.search(item[1])
+        if not citation_match:
+            continue
+        candidates = [g for g in groups_by_key.get(citation_match.group(1), []) if id(g) not in consumed_ids]
+        if candidates:
+            group_item = candidates[0]
+            consumed_ids.add(id(group_item))
+            outline_pairs[id(item)] = group_item
+
+    result: list[tuple[str, list[str]]] = []
+    for item in raw_items:
+        if item[0] == 'outline':
+            result.append(('equals', [re.sub(r'=', '=\n', item[1])]))
+            matched = outline_pairs.get(id(item))
+            if matched:
+                result.append(('bible', _format_bible_group(matched[1])))
+        elif id(item) not in consumed_ids:
+            result.append(('bible', _format_bible_group(item[1])))
+
+    return result
