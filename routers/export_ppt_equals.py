@@ -2,21 +2,19 @@ import io
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pptx import Presentation
-from pptx.dml.color import RGBColor
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
-from pptx.util import Inches, Pt
+from pptx.util import Inches
 from schemas.line_break import LineBreakEqualsExportRequest
 from utils.pptx_helpers import set_east_asian_font
+from utils.slide_styles import EQUALS_STYLE, SLIDE_HEIGHT, SLIDE_WIDTH
 from utils.text_processing import apply_equals_line_break
 
 router = APIRouter(prefix="/line-break/equals/export_ppt", tags=["export"])
 
-FONT_NAME = "맑은 고딕"
-FONT_SIZE = Pt(60)
-FONT_COLOR = RGBColor(0xFF, 0xFF, 0xFF)
-BACKGROUND_COLOR = RGBColor(0x00, 0x00, 0x00)
-SLIDE_WIDTH = Inches(13.333)
-SLIDE_HEIGHT = Inches(7.5)
+FONT_NAME = EQUALS_STYLE["font_name"]
+FONT_SIZE = EQUALS_STYLE["font_size"]
+FONT_COLOR = EQUALS_STYLE["font_color"]
+BACKGROUND_COLOR = EQUALS_STYLE["background_color"]
 
 ALIGN_MAP = {
     "left": PP_ALIGN.LEFT,

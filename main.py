@@ -5,8 +5,10 @@ from routers import (
     root,
     line_break,
     line_break_equals,
+    line_break_combined,
     export_ppt,
     export_ppt_equals,
+    export_ppt_combined,
     export_docx,
     export_xlsx,
 )
@@ -18,7 +20,9 @@ app.include_router(client.router)
 app.include_router(bible_lookup.router)
 app.include_router(line_break.router)
 app.include_router(line_break_equals.router)
+app.include_router(line_break_combined.router)
 app.include_router(export_ppt.router)
 app.include_router(export_ppt_equals.router)
+app.include_router(export_ppt_combined.router)
 app.include_router(export_docx.router)
 app.include_router(export_xlsx.router)

@@ -10,7 +10,7 @@ from docx import Document
 import openpyxl
 from main import app
 from utils.bible_api import BibleAPIError, generate_bible_text, normalize_korean_reference, parse_reference_lines
-from utils.text_processing import apply_equals_line_break, inspect_line_breaks
+from utils.text_processing import apply_combined_line_break, apply_equals_line_break, inspect_line_breaks
 
 client = TestClient(app)
 
@@ -31,12 +31,13 @@ def test_client_page():
     assert 'Line Break Test Client' in response.text
     assert 'line break' in response.text
     assert 'bible lookup' in response.text
-    assert '/line-break/export_xlsx' in response.text
+    assert '/line-break/combined/export_ppt' in response.text
     assert '/bible/generate' in response.text
     assert 'Generate Bible Text' in response.text
     assert 'Output copied.' in response.text
-    assert 'Bible' in response.text
+    assert 'Bible + Outline' in response.text
     assert 'General Text' in response.text
+    assert 'id="combined-line-break-panel"' in response.text
     assert 'id="general-line-break-panel"' in response.text
     assert 'data-criterion="."' in response.text
     assert 'data-criterion=","' in response.text
@@ -48,9 +49,9 @@ def test_client_page():
     assert 'Check mark' in response.text
     assert 'id="processGeneralBtn"' in response.text
     assert 'id="copyGeneralResultBtn"' in response.text
-    assert 'id="copyResultBtn"' in response.text
+    assert 'id="copyCombinedResultBtn"' in response.text
     assert 'id="copyLookupBtn"' in response.text
-    assert 'id="eraseSourceBtn"' in response.text
+    assert 'id="eraseCombinedSourceBtn"' in response.text
     assert 'id="eraseLookupInputBtn"' in response.text
     assert 'id="eraseResultBtn"' not in response.text
     assert 'id="eraseLookupResultBtn"' not in response.text
@@ -77,7 +78,7 @@ def test_client_page_korean_query_locale():
     assert '처리된 출력 복사' in response.text
     assert '일반 출력 복사' in response.text
     assert '출력이 복사되었습니다.' in response.text
-    assert '/line-break/export_xlsx' in response.text
+    assert '/line-break/combined/export_ppt' in response.text
     assert '/bible/generate' in response.text
 
 
@@ -631,6 +632,107 @@ class TestExportPPTEquals:
     def test_align_invalid_value_rejected(self):
         response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)', 'align': 'justify'})
         assert response.status_code == 422
+
+
+# ── utils.text_processing.apply_combined_line_break ───────────────────────────
+
+class TestApplyCombinedLineBreak:
+    def test_equals_line_is_classified_equals(self):
+        entries = apply_combined_line_break('첫째:날마다=그리스도말씀들어야(롬10:17)')
+        assert entries == [('equals', '첫째:날마다=\n그리스도말씀들어야(롬10:17)')]
+
+    def test_bible_line_is_classified_bible(self):
+        text = '롬10:17 그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라'
+        entries = apply_combined_line_break(text)
+        assert entries == [
+            ('bible', '롬10:17\n그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라')
+        ]
+
+    def test_mixed_lines_preserve_order_and_kind(self):
+        text = (
+            '첫째:날마다=그리스도말씀들어야(롬10:17)\n'
+            '롬10:17 그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라'
+        )
+        entries = apply_combined_line_break(text)
+        assert entries == [
+            ('equals', '첫째:날마다=\n그리스도말씀들어야(롬10:17)'),
+            ('bible', '롬10:17\n그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라'),
+        ]
+
+    def test_blank_lines_are_dropped(self):
+        text = '첫째:날마다=그리스도말씀들어야(롬10:17)\n\n롬10:17 그러므로 믿음은 들음에서 나며'
+        entries = apply_combined_line_break(text)
+        assert len(entries) == 2
+
+
+# ── POST /line-break/combined ──────────────────────────────────────────────────
+
+class TestLineBreakCombined:
+    def test_mixed_input(self):
+        text = (
+            '첫째:날마다=그리스도말씀들어야(롬10:17)\n'
+            '롬10:17 그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라'
+        )
+        response = client.post('/line-break/combined', json={'text': text})
+        assert response.status_code == 200
+        result = response.json()['result']
+        assert '첫째:날마다=\n그리스도말씀들어야(롬10:17)' in result
+        assert '롬10:17\n그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라' in result
+        assert result.count('\n\n') == 1
+
+
+# ── POST /line-break/combined/export_ppt ──────────────────────────────────────
+
+class TestExportPPTCombined:
+    MIXED_TEXT = (
+        '첫째:날마다=그리스도말씀들어야(롬10:17)\n'
+        '롬10:17 그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라'
+    )
+
+    def test_status_and_content_type(self):
+        response = client.post('/line-break/combined/export_ppt', json={'text': self.MIXED_TEXT})
+        assert response.status_code == 200
+        assert 'presentationml' in response.headers['content-type']
+
+    def test_produces_one_slide_per_line(self):
+        response = client.post('/line-break/combined/export_ppt', json={'text': self.MIXED_TEXT})
+        prs = Presentation(io.BytesIO(response.content))
+        assert len(prs.slides) == 2
+
+    def test_equals_slide_keeps_outline_styling(self):
+        from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
+        response = client.post('/line-break/combined/export_ppt', json={'text': self.MIXED_TEXT})
+        prs = Presentation(io.BytesIO(response.content))
+        slide = prs.slides[0]
+        shape = slide.shapes[0]
+        run = shape.text_frame.paragraphs[0].runs[0]
+        assert slide.background.fill.fore_color.rgb == RGBColor(0x00, 0x00, 0x00)
+        assert run.font.name == '맑은 고딕'
+        assert run.font.size.pt == 60
+        assert run.font.bold is True
+        assert run.font.color.rgb == RGBColor(0xFF, 0xFF, 0xFF)
+        assert shape.text_frame.paragraphs[0].alignment == PP_ALIGN.CENTER
+        assert shape.text_frame.vertical_anchor == MSO_ANCHOR.MIDDLE
+
+    def test_bible_slide_keeps_bible_styling(self):
+        response = client.post('/line-break/combined/export_ppt', json={'text': self.MIXED_TEXT})
+        prs = Presentation(io.BytesIO(response.content))
+        slide = prs.slides[1]
+        shape = slide.shapes[0]
+        run = shape.text_frame.paragraphs[0].runs[0]
+        assert slide.background.fill.fore_color.rgb == RGBColor(0x20, 0x38, 0x64)
+        assert run.font.name == 'KoPubWorld바탕체 Bold'
+        assert run.font.size.pt == 52
+        assert run.font.bold is None
+        assert run.font.color.rgb == RGBColor(0xFF, 0xFF, 0xFF)
+        assert shape.text_frame.paragraphs[0].alignment is None
+
+    def test_align_applies_only_to_equals_slide(self):
+        from pptx.enum.text import PP_ALIGN
+        response = client.post('/line-break/combined/export_ppt', json={'text': self.MIXED_TEXT, 'align': 'left'})
+        prs = Presentation(io.BytesIO(response.content))
+        assert prs.slides[0].shapes[0].text_frame.paragraphs[0].alignment == PP_ALIGN.LEFT
+        assert prs.slides[1].shapes[0].text_frame.paragraphs[0].alignment is None
 
 
 # ── POST /line-break/export_docx ─────────────────────────────────────────────

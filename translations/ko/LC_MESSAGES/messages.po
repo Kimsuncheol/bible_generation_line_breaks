@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bible-generation-line-breaks 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-11 22:37+0900\n"
+"POT-Creation-Date: 2026-07-11 23:13+0900\n"
 "PO-Revision-Date: 2026-05-28 00:00+0900\n"
 "Last-Translator: \n"
 "Language: ko\n"
@@ -14,13 +14,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: routers/client.py:22 templates/client.html:489 templates/client.html:542
-#: templates/client.html:611
+#: routers/client.py:22 templates/client.html:488 templates/client.html:549
 msgid "chars"
 msgstr "자"
 
-#: routers/client.py:23 templates/client.html:520 templates/client.html:589
-#: templates/client.html:649 templates/client.html:708
+#: routers/client.py:23 templates/client.html:527 templates/client.html:596
+#: templates/client.html:656
 msgid "lines"
 msgstr "줄"
 
@@ -76,12 +75,11 @@ msgstr "조회 텍스트를 입력에 복사했습니다."
 msgid "No lookup text available."
 msgstr "사용할 조회 텍스트가 없습니다."
 
-#: routers/client.py:37 templates/client.html:511 templates/client.html:640
-#: templates/client.html:699
+#: routers/client.py:37 templates/client.html:518 templates/client.html:647
 msgid "Ready."
 msgstr "준비됨."
 
-#: routers/client.py:38 templates/client.html:583
+#: routers/client.py:38 templates/client.html:590
 msgid "Select a line-break criterion first."
 msgstr "먼저 줄바꿈 기준을 선택하세요."
 
@@ -123,7 +121,7 @@ msgstr "성경 조회"
 msgid "Line Break Tools"
 msgstr "줄바꿈 도구"
 
-#: templates/client.html:474 templates/client.html:671
+#: templates/client.html:474 templates/client.html:619
 msgid "Calls"
 msgstr "호출:"
 
@@ -136,190 +134,203 @@ msgid "Line Break Modes"
 msgstr "줄바꿈 모드"
 
 #: templates/client.html:479
-msgid "Bible"
-msgstr "성경"
+msgid "Bible + Outline"
+msgstr "성경 + 개요"
 
 #: templates/client.html:480
 msgid "General Text"
 msgstr "일반 텍스트"
 
-#: templates/client.html:481
-msgid "Outline (=)"
-msgstr "개요 (=)"
-
-#: templates/client.html:488 templates/client.html:610
+#: templates/client.html:487
 msgid "Input Text"
 msgstr "입력 텍스트"
 
-#: templates/client.html:494 templates/client.html:616
+#: templates/client.html:493
 msgid "Clear input text"
 msgstr "입력 텍스트 지우기"
 
-#: templates/client.html:505 templates/client.html:636
-msgid "Process Text"
-msgstr "텍스트 처리"
-
-#: templates/client.html:506
-msgid "Download DOCX"
-msgstr "DOCX 다운로드"
-
-#: templates/client.html:507 templates/client.html:637
-msgid "Download PPTX"
-msgstr "PPTX 다운로드"
-
-#: templates/client.html:508
-msgid "Download XLSX"
-msgstr "XLSX 다운로드"
-
-#: templates/client.html:513
-msgid ""
-"Paste any source text here and run the existing line-break and export "
-"endpoints."
-msgstr "여기에 원본 텍스트를 붙여넣고 기존 줄바꿈 및 내보내기 엔드포인트를 실행하세요."
-
-#: templates/client.html:519 templates/client.html:648
-msgid "Processed Output"
-msgstr "처리된 출력"
-
-#: templates/client.html:523 templates/client.html:652
-msgid "Processed text will appear here."
-msgstr "처리된 텍스트가 여기에 표시됩니다."
-
-#: templates/client.html:525 templates/client.html:654
-msgid "Copy processed output"
-msgstr "처리된 출력 복사"
-
-#: templates/client.html:541
-msgid "General Input"
-msgstr "일반 입력"
-
-#: templates/client.html:545
-msgid "Paste general text here."
-msgstr "일반 텍스트를 여기에 붙여넣으세요."
-
-#: templates/client.html:547
-msgid "Clear general input"
-msgstr "일반 입력 지우기"
-
-#: templates/client.html:559 templates/client.html:560
-msgid "Criterion"
-msgstr "기준"
-
-#: templates/client.html:567
-msgid "List style"
-msgstr "목록 스타일"
-
-#: templates/client.html:569
-msgid "None"
-msgstr "없음"
-
-#: templates/client.html:570
-msgid "Arabic number"
-msgstr "아라비아 숫자"
-
-#: templates/client.html:571
-msgid "Roman number"
-msgstr "로마 숫자"
-
-#: templates/client.html:572
-msgid "Chinese number"
-msgstr "한자 숫자"
-
-#: templates/client.html:573
-msgid "Bullet"
-msgstr "글머리 기호"
-
-#: templates/client.html:574
-msgid "Check mark"
-msgstr "체크 표시"
-
-#: templates/client.html:580
-msgid "Process General Text"
-msgstr "일반 텍스트 처리"
-
-#: templates/client.html:588
-msgid "General Output"
-msgstr "일반 출력"
-
-#: templates/client.html:592
-msgid "General processed text will appear here."
-msgstr "처리된 일반 텍스트가 여기에 표시됩니다."
-
-#: templates/client.html:594
-msgid "Copy general output"
-msgstr "일반 출력 복사"
-
-#: templates/client.html:627 templates/client.html:628
+#: templates/client.html:504 templates/client.html:505
 msgid "Text Alignment"
 msgstr "텍스트 정렬"
 
-#: templates/client.html:629
+#: templates/client.html:506
 msgid "Left"
 msgstr "왼쪽"
 
-#: templates/client.html:630
+#: templates/client.html:507
 msgid "Center"
 msgstr "가운데"
 
-#: templates/client.html:631
+#: templates/client.html:508
 msgid "Right"
 msgstr "오른쪽"
 
-#: templates/client.html:642
+#: templates/client.html:510
 msgid ""
-"Each input line becomes one slide; the line breaks right after every '=' "
-"sign."
-msgstr "입력한 각 줄이 하나의 슬라이드가 되며, '=' 기호 뒤에서 줄이 바뀝니다."
+"Alignment applies to outline ('=') slides only; Bible-verse slides keep "
+"their original layout."
+msgstr "정렬은 개요('=') 슬라이드에만 적용되며, 성경 구절 슬라이드는 원래 레이아웃을 유지합니다."
 
-#: templates/client.html:670
+#: templates/client.html:514
+msgid "Process Text"
+msgstr "텍스트 처리"
+
+#: templates/client.html:515
+msgid "Download PPTX"
+msgstr "PPTX 다운로드"
+
+#: templates/client.html:520
+msgid ""
+"Lines starting with a Bible reference (e.g. '롬10:17 ...') become Bible-"
+"style slides; every other line becomes an outline slide, breaking after "
+"each '='."
+msgstr "'롬10:17 ...'처럼 성경 구절로 시작하는 줄은 성경 스타일 슬라이드가 되고, 그 외의 줄은 '=' 뒤에서 줄이 바뀌는 개요 슬라이드가 됩니다."
+
+#: templates/client.html:526
+msgid "Processed Output"
+msgstr "처리된 출력"
+
+#: templates/client.html:530
+msgid "Processed text will appear here."
+msgstr "처리된 텍스트가 여기에 표시됩니다."
+
+#: templates/client.html:532
+msgid "Copy processed output"
+msgstr "처리된 출력 복사"
+
+#: templates/client.html:548
+msgid "General Input"
+msgstr "일반 입력"
+
+#: templates/client.html:552
+msgid "Paste general text here."
+msgstr "일반 텍스트를 여기에 붙여넣으세요."
+
+#: templates/client.html:554
+msgid "Clear general input"
+msgstr "일반 입력 지우기"
+
+#: templates/client.html:566 templates/client.html:567
+msgid "Criterion"
+msgstr "기준"
+
+#: templates/client.html:574
+msgid "List style"
+msgstr "목록 스타일"
+
+#: templates/client.html:576
+msgid "None"
+msgstr "없음"
+
+#: templates/client.html:577
+msgid "Arabic number"
+msgstr "아라비아 숫자"
+
+#: templates/client.html:578
+msgid "Roman number"
+msgstr "로마 숫자"
+
+#: templates/client.html:579
+msgid "Chinese number"
+msgstr "한자 숫자"
+
+#: templates/client.html:580
+msgid "Bullet"
+msgstr "글머리 기호"
+
+#: templates/client.html:581
+msgid "Check mark"
+msgstr "체크 표시"
+
+#: templates/client.html:587
+msgid "Process General Text"
+msgstr "일반 텍스트 처리"
+
+#: templates/client.html:595
+msgid "General Output"
+msgstr "일반 출력"
+
+#: templates/client.html:599
+msgid "General processed text will appear here."
+msgstr "처리된 일반 텍스트가 여기에 표시됩니다."
+
+#: templates/client.html:601
+msgid "Copy general output"
+msgstr "일반 출력 복사"
+
+#: templates/client.html:618
 msgid "Bible Lookup"
 msgstr "성경 조회"
 
-#: templates/client.html:671
+#: templates/client.html:619
 msgid "and expands multiple Korean references into one combined text block."
 msgstr "여러 한국어 성경 구절을 하나의 텍스트 블록으로 확장합니다."
 
-#: templates/client.html:679
+#: templates/client.html:627
 msgid "Input References"
 msgstr "입력 구절"
 
-#: templates/client.html:683
+#: templates/client.html:631
 msgid "Clear input references"
 msgstr "입력 구절 지우기"
 
-#: templates/client.html:695
+#: templates/client.html:643
 msgid "Generate Bible Text"
 msgstr "성경 본문 생성"
 
-#: templates/client.html:696
+#: templates/client.html:644
 msgid "Use In Input"
 msgstr "입력에 사용"
 
-#: templates/client.html:700
+#: templates/client.html:648
 msgid "Accepted examples:"
 msgstr "허용되는 예:"
 
-#: templates/client.html:700
+#: templates/client.html:648
 msgid "Duplicate references are removed automatically."
 msgstr "중복 구절은 자동으로 제거됩니다."
 
-#: templates/client.html:701
+#: templates/client.html:649
 msgid "References wrapped in parentheses, like"
 msgstr "괄호로 묶인 구절, 예를 들어"
 
-#: templates/client.html:701
+#: templates/client.html:649
 msgid "are also accepted — the parentheses are stripped automatically."
 msgstr "도 허용됩니다 — 괄호는 자동으로 제거됩니다."
 
-#: templates/client.html:707
+#: templates/client.html:655
 msgid "Generated Output"
 msgstr "생성된 출력"
 
-#: templates/client.html:711
+#: templates/client.html:659
 msgid "Generated Bible text will appear here."
 msgstr "생성된 성경 본문이 여기에 표시됩니다."
 
-#: templates/client.html:713
+#: templates/client.html:661
 msgid "Copy generated output"
 msgstr "생성된 출력 복사"
+
+#~ msgid "Bible"
+#~ msgstr "성경"
+
+#~ msgid "Outline (=)"
+#~ msgstr "개요 (=)"
+
+#~ msgid "Download DOCX"
+#~ msgstr "DOCX 다운로드"
+
+#~ msgid "Download XLSX"
+#~ msgstr "XLSX 다운로드"
+
+#~ msgid ""
+#~ "Paste any source text here and run"
+#~ " the existing line-break and export"
+#~ " endpoints."
+#~ msgstr "여기에 원본 텍스트를 붙여넣고 기존 줄바꿈 및 내보내기 엔드포인트를 실행하세요."
+
+#~ msgid ""
+#~ "Each input line becomes one slide; "
+#~ "the line breaks right after every "
+#~ "'=' sign."
+#~ msgstr "입력한 각 줄이 하나의 슬라이드가 되며, '=' 기호 뒤에서 줄이 바뀝니다."
 

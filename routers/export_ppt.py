@@ -2,20 +2,18 @@ import io
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pptx import Presentation
-from pptx.dml.color import RGBColor
-from pptx.util import Inches, Pt
+from pptx.util import Inches
 from schemas.line_break import LineBreakRequest
 from utils.pptx_helpers import set_east_asian_font
+from utils.slide_styles import BIBLE_STYLE, SLIDE_HEIGHT, SLIDE_WIDTH
 from utils.text_processing import apply_line_break, inspect_line_breaks
 
 router = APIRouter(prefix="/line-break/export_ppt", tags=["export"])
 
-FONT_NAME = "KoPubWorld바탕체 Bold"
-FONT_SIZE = Pt(52)
-FONT_COLOR = RGBColor(0xFF, 0xFF, 0xFF)
-BACKGROUND_COLOR = RGBColor(0x20, 0x38, 0x64)
-SLIDE_WIDTH = Inches(13.333)
-SLIDE_HEIGHT = Inches(7.5)
+FONT_NAME = BIBLE_STYLE["font_name"]
+FONT_SIZE = BIBLE_STYLE["font_size"]
+FONT_COLOR = BIBLE_STYLE["font_color"]
+BACKGROUND_COLOR = BIBLE_STYLE["background_color"]
 
 
 @router.post('')

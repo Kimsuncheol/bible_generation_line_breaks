@@ -471,27 +471,26 @@
       <div class="section-header">
         <div>
           <h2 class="section-title">{{ _("Line Break Tools") }}</h2>
-          <p class="section-copy">{{ _("Calls") }} <code>/line-break</code>, <code>/line-break/export_docx</code>, <code>/line-break/export_ppt</code>, {{ _("and") }} <code>/line-break/export_xlsx</code>.</p>
+          <p class="section-copy">{{ _("Calls") }} <code>/line-break/combined</code> {{ _("and") }} <code>/line-break/combined/export_ppt</code>.</p>
         </div>
       </div>
 
       <nav class="subtabs" aria-label="{{ _('Line Break Modes') }}">
-        <button class="subtab-button" type="button" data-line-break-tab-target="bible-line-break-panel" aria-selected="true">{{ _("Bible") }}</button>
+        <button class="subtab-button" type="button" data-line-break-tab-target="combined-line-break-panel" aria-selected="true">{{ _("Bible + Outline") }}</button>
         <button class="subtab-button" type="button" data-line-break-tab-target="general-line-break-panel" aria-selected="false">{{ _("General Text") }}</button>
-        <button class="subtab-button" type="button" data-line-break-tab-target="equals-line-break-panel" aria-selected="false">{{ _("Outline (=)") }}</button>
       </nav>
 
-      <div class="subtab-panel is-active" id="bible-line-break-panel">
+      <div class="subtab-panel is-active" id="combined-line-break-panel">
         <div class="tool-grid">
         <section class="panel">
           <div class="meta-row">
             <span>{{ _("Input Text") }}</span>
-            <span id="inputMeta">0 {{ _("chars") }}</span>
+            <span id="combinedInputMeta">0 {{ _("chars") }}</span>
           </div>
           <div class="field-shell">
-            <textarea id="sourceText" spellcheck="false" placeholder="창1:1 태초에 하나님이 천지를 창조하시니라&#10;&#10;창1:2 땅이 혼돈하고 공허하며"></textarea>
-            <div class="field-actions" id="sourceActions" hidden>
-              <button class="field-icon-button eraser-button" id="eraseSourceBtn" type="button" aria-label="{{ _('Clear input text') }}" title="{{ _('Clear input text') }}">
+            <textarea id="combinedSourceText" spellcheck="false" placeholder="첫째:날마다=그리스도말씀들어야(롬10:17)&#10;롬10:17 그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라"></textarea>
+            <div class="field-actions" id="combinedSourceActions" hidden>
+              <button class="field-icon-button eraser-button" id="eraseCombinedSourceBtn" type="button" aria-label="{{ _('Clear input text') }}" title="{{ _('Clear input text') }}">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="m7 21-4-4L14 6l4 4L7 21Z"></path>
                   <path d="m14 6 3-3 4 4-3 3"></path>
@@ -501,28 +500,36 @@
             </div>
           </div>
 
-          <div class="controls" style="margin-top: 18px;">
-            <button class="primary" id="processBtn" type="button">{{ _("Process Text") }}</button>
-            <button class="secondary" id="docxBtn" type="button">{{ _("Download DOCX") }}</button>
-            <button class="secondary" id="pptxBtn" type="button">{{ _("Download PPTX") }}</button>
-            <button class="secondary" id="xlsxBtn" type="button">{{ _("Download XLSX") }}</button>
+          <div style="margin-top: 18px;">
+            <label class="field-label">{{ _("Text Alignment") }}</label>
+            <div class="segmented-control" role="group" aria-label="{{ _('Text Alignment') }}" id="combinedAlignControl">
+              <button class="criterion-button align-button" type="button" data-align="left" aria-pressed="false">{{ _("Left") }}</button>
+              <button class="criterion-button align-button" type="button" data-align="center" aria-pressed="true">{{ _("Center") }}</button>
+              <button class="criterion-button align-button" type="button" data-align="right" aria-pressed="false">{{ _("Right") }}</button>
+            </div>
+            <p class="hint" style="margin-top: 8px;">{{ _("Alignment applies to outline ('=') slides only; Bible-verse slides keep their original layout.") }}</p>
           </div>
 
-          <div class="status" id="statusText" style="margin-top: 16px;">{{ _("Ready.") }}</div>
+          <div class="controls" style="margin-top: 18px;">
+            <button class="primary" id="combinedProcessBtn" type="button">{{ _("Process Text") }}</button>
+            <button class="secondary" id="combinedPptxBtn" type="button">{{ _("Download PPTX") }}</button>
+          </div>
+
+          <div class="status" id="combinedStatusText" style="margin-top: 16px;">{{ _("Ready.") }}</div>
           <p class="hint" style="margin-top: 14px;">
-            {{ _("Paste any source text here and run the existing line-break and export endpoints.") }}
+            {{ _("Lines starting with a Bible reference (e.g. '롬10:17 ...') become Bible-style slides; every other line becomes an outline slide, breaking after each '='.") }}
           </p>
         </section>
 
         <section class="panel">
           <div class="meta-row">
             <span>{{ _("Processed Output") }}</span>
-            <span id="outputMeta">0 {{ _("lines") }}</span>
+            <span id="combinedOutputMeta">0 {{ _("lines") }}</span>
           </div>
           <div class="field-shell has-copy">
-            <pre id="resultText" data-placeholder="{{ _('Processed text will appear here.') }}"></pre>
-            <div class="field-actions" id="resultActions" hidden>
-              <button class="field-icon-button copy-output-button" id="copyResultBtn" type="button" aria-label="{{ _('Copy processed output') }}" title="{{ _('Copy processed output') }}">
+            <pre id="combinedResultText" data-placeholder="{{ _('Processed text will appear here.') }}"></pre>
+            <div class="field-actions" id="combinedResultActions" hidden>
+              <button class="field-icon-button copy-output-button" id="copyCombinedResultBtn" type="button" aria-label="{{ _('Copy processed output') }}" title="{{ _('Copy processed output') }}">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -603,65 +610,6 @@
         </div>
       </div>
 
-      <div class="subtab-panel" id="equals-line-break-panel">
-        <div class="tool-grid">
-        <section class="panel">
-          <div class="meta-row">
-            <span>{{ _("Input Text") }}</span>
-            <span id="equalsInputMeta">0 {{ _("chars") }}</span>
-          </div>
-          <div class="field-shell">
-            <textarea id="equalsSourceText" spellcheck="false" placeholder="첫째:생활가난때=생활부요믿어야(고후8:9)&#10;둘째:귀신역사때=귀신축귀믿어야(막16:16~17)"></textarea>
-            <div class="field-actions" id="equalsSourceActions" hidden>
-              <button class="field-icon-button eraser-button" id="eraseEqualsSourceBtn" type="button" aria-label="{{ _('Clear input text') }}" title="{{ _('Clear input text') }}">
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m7 21-4-4L14 6l4 4L7 21Z"></path>
-                  <path d="m14 6 3-3 4 4-3 3"></path>
-                  <path d="M5 19h16"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div style="margin-top: 18px;">
-            <label class="field-label">{{ _("Text Alignment") }}</label>
-            <div class="segmented-control" role="group" aria-label="{{ _('Text Alignment') }}" id="equalsAlignControl">
-              <button class="criterion-button align-button" type="button" data-align="left" aria-pressed="false">{{ _("Left") }}</button>
-              <button class="criterion-button align-button" type="button" data-align="center" aria-pressed="true">{{ _("Center") }}</button>
-              <button class="criterion-button align-button" type="button" data-align="right" aria-pressed="false">{{ _("Right") }}</button>
-            </div>
-          </div>
-
-          <div class="controls" style="margin-top: 18px;">
-            <button class="primary" id="equalsProcessBtn" type="button">{{ _("Process Text") }}</button>
-            <button class="secondary" id="equalsPptxBtn" type="button">{{ _("Download PPTX") }}</button>
-          </div>
-
-          <div class="status" id="equalsStatusText" style="margin-top: 16px;">{{ _("Ready.") }}</div>
-          <p class="hint" style="margin-top: 14px;">
-            {{ _("Each input line becomes one slide; the line breaks right after every '=' sign.") }}
-          </p>
-        </section>
-
-        <section class="panel">
-          <div class="meta-row">
-            <span>{{ _("Processed Output") }}</span>
-            <span id="equalsOutputMeta">0 {{ _("lines") }}</span>
-          </div>
-          <div class="field-shell has-copy">
-            <pre id="equalsResultText" data-placeholder="{{ _('Processed text will appear here.') }}"></pre>
-            <div class="field-actions" id="equalsResultActions" hidden>
-              <button class="field-icon-button copy-output-button" id="copyEqualsResultBtn" type="button" aria-label="{{ _('Copy processed output') }}" title="{{ _('Copy processed output') }}">
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </section>
-        </div>
-      </div>
     </section>
 
     <section class="section tab-panel" id="bible-lookup-panel">
@@ -734,12 +682,6 @@
     const lineBreakTabPanels = Array.from(document.querySelectorAll(".subtab-panel"));
     const criterionButtons = Array.from(document.querySelectorAll("[data-criterion]"));
 
-    const sourceText = document.getElementById("sourceText");
-    const resultText = document.getElementById("resultText");
-    const statusText = document.getElementById("statusText");
-    const inputMeta = document.getElementById("inputMeta");
-    const outputMeta = document.getElementById("outputMeta");
-
     const lookupInput = document.getElementById("lookupInput");
     const lookupResult = document.getElementById("lookupResult");
     const lookupMeta = document.getElementById("lookupMeta");
@@ -753,36 +695,31 @@
     const generalListStyle = document.getElementById("generalListStyle");
     const processGeneralBtn = document.getElementById("processGeneralBtn");
 
-    const equalsSourceText = document.getElementById("equalsSourceText");
-    const equalsResultText = document.getElementById("equalsResultText");
-    const equalsInputMeta = document.getElementById("equalsInputMeta");
-    const equalsOutputMeta = document.getElementById("equalsOutputMeta");
-    const equalsStatusText = document.getElementById("equalsStatusText");
+    const combinedSourceText = document.getElementById("combinedSourceText");
+    const combinedResultText = document.getElementById("combinedResultText");
+    const combinedInputMeta = document.getElementById("combinedInputMeta");
+    const combinedOutputMeta = document.getElementById("combinedOutputMeta");
+    const combinedStatusText = document.getElementById("combinedStatusText");
 
-    const copyResultBtn = document.getElementById("copyResultBtn");
     const copyLookupBtn = document.getElementById("copyLookupBtn");
     const copyGeneralResultBtn = document.getElementById("copyGeneralResultBtn");
-    const copyEqualsResultBtn = document.getElementById("copyEqualsResultBtn");
-    const eraseSourceBtn = document.getElementById("eraseSourceBtn");
+    const copyCombinedResultBtn = document.getElementById("copyCombinedResultBtn");
     const eraseLookupInputBtn = document.getElementById("eraseLookupInputBtn");
     const eraseGeneralSourceBtn = document.getElementById("eraseGeneralSourceBtn");
-    const eraseEqualsSourceBtn = document.getElementById("eraseEqualsSourceBtn");
+    const eraseCombinedSourceBtn = document.getElementById("eraseCombinedSourceBtn");
 
-    const sourceActions = document.getElementById("sourceActions");
-    const resultActions = document.getElementById("resultActions");
     const lookupInputActions = document.getElementById("lookupInputActions");
     const lookupResultActions = document.getElementById("lookupResultActions");
     const generalSourceActions = document.getElementById("generalSourceActions");
     const generalResultActions = document.getElementById("generalResultActions");
-    const equalsSourceActions = document.getElementById("equalsSourceActions");
-    const equalsResultActions = document.getElementById("equalsResultActions");
+    const combinedSourceActions = document.getElementById("combinedSourceActions");
+    const combinedResultActions = document.getElementById("combinedResultActions");
 
-    const lineBreakButtons = Array.from(document.querySelectorAll("#processBtn, #docxBtn, #pptxBtn, #xlsxBtn"));
     const lookupButtons = Array.from(document.querySelectorAll("#lookupBtn, #useLookupBtn"));
-    const equalsButtons = Array.from(document.querySelectorAll("#equalsProcessBtn, #equalsPptxBtn"));
-    const equalsAlignButtons = Array.from(document.querySelectorAll("#equalsAlignControl [data-align]"));
+    const combinedButtons = Array.from(document.querySelectorAll("#combinedProcessBtn, #combinedPptxBtn"));
+    const combinedAlignButtons = Array.from(document.querySelectorAll("#combinedAlignControl [data-align]"));
     let selectedGeneralCriterion = "";
-    let selectedEqualsAlign = "center";
+    let selectedCombinedAlign = "center";
 
     function activateMainTab(targetId) {
       tabButtons.forEach((button) => {
@@ -827,14 +764,6 @@
       return text ? text.split(/\r\n|\r|\n/).length : 0;
     }
 
-    function updateInputMeta() {
-      inputMeta.textContent = `${sourceText.value.length} ${i18n.chars_suffix}`;
-    }
-
-    function updateOutputMeta(text) {
-      outputMeta.textContent = `${lineCount(text)} ${i18n.lines_suffix}`;
-    }
-
     function updateLookupMeta(text) {
       lookupMeta.textContent = `${lineCount(text)} ${i18n.lines_suffix}`;
     }
@@ -847,12 +776,12 @@
       generalOutputMeta.textContent = `${lineCount(text)} ${i18n.lines_suffix}`;
     }
 
-    function updateEqualsInputMeta() {
-      equalsInputMeta.textContent = `${equalsSourceText.value.length} ${i18n.chars_suffix}`;
+    function updateCombinedInputMeta() {
+      combinedInputMeta.textContent = `${combinedSourceText.value.length} ${i18n.chars_suffix}`;
     }
 
-    function updateEqualsOutputMeta(text) {
-      equalsOutputMeta.textContent = `${lineCount(text)} ${i18n.lines_suffix}`;
+    function updateCombinedOutputMeta(text) {
+      combinedOutputMeta.textContent = `${lineCount(text)} ${i18n.lines_suffix}`;
     }
 
     function isRealOutputText(target) {
@@ -862,16 +791,14 @@
     }
 
     function updateFieldActions() {
-      sourceActions.hidden = !sourceText.value.trim();
       lookupInputActions.hidden = !lookupInput.value.trim();
-      resultActions.hidden = !isRealOutputText(resultText);
       lookupResultActions.hidden = !isRealOutputText(lookupResult);
       generalSourceActions.hidden = !generalSourceText.value.trim();
       generalResultActions.hidden = !isRealOutputText(generalResultText);
       generalListStyle.disabled = !selectedGeneralCriterion;
       processGeneralBtn.disabled = !(selectedGeneralCriterion && generalSourceText.value.trim());
-      equalsSourceActions.hidden = !equalsSourceText.value.trim();
-      equalsResultActions.hidden = !isRealOutputText(equalsResultText);
+      combinedSourceActions.hidden = !combinedSourceText.value.trim();
+      combinedResultActions.hidden = !isRealOutputText(combinedResultText);
     }
 
     function showCopyAlert(message, icon = "success") {
@@ -1060,9 +987,9 @@
       setStatus(generalStatusText, generalSourceText.value.trim() ? i18n.ready : i18n.general_input_required, !generalSourceText.value.trim());
     }
 
-    function selectEqualsAlign(align) {
-      selectedEqualsAlign = align;
-      equalsAlignButtons.forEach((button) => {
+    function selectCombinedAlign(align) {
+      selectedCombinedAlign = align;
+      combinedAlignButtons.forEach((button) => {
         button.setAttribute("aria-pressed", button.dataset.align === align ? "true" : "false");
       });
     }
@@ -1108,34 +1035,30 @@
       return postJsonWithBody(url, { text });
     }
 
-    async function postJson(url) {
-      return postJsonWithText(url, sourceText.value);
-    }
-
-    async function processText() {
-      setBusy(lineBreakButtons, true);
-      setStatus(statusText, i18n.processing);
+    async function processCombinedText() {
+      setBusy(combinedButtons, true);
+      setStatus(combinedStatusText, i18n.processing);
 
       try {
-        const response = await postJson("/line-break");
+        const response = await postJsonWithText("/line-break/combined", combinedSourceText.value);
         const data = await response.json();
-        resultText.textContent = data.result || "";
-        updateOutputMeta(data.result || "");
+        combinedResultText.textContent = data.result || "";
+        updateCombinedOutputMeta(data.result || "");
         updateFieldActions();
-        setStatus(statusText, i18n.processed);
+        setStatus(combinedStatusText, i18n.processed);
       } catch (error) {
-        setStatus(statusText, error.message, true);
+        setStatus(combinedStatusText, error.message, true);
       } finally {
-        setBusy(lineBreakButtons, false);
+        setBusy(combinedButtons, false);
       }
     }
 
-    async function downloadFile(url, filename) {
-      setBusy(lineBreakButtons, true);
-      setStatus(statusText, formatMessage(i18n.preparing, { filename }));
+    async function downloadCombinedFile(url, filename) {
+      setBusy(combinedButtons, true);
+      setStatus(combinedStatusText, formatMessage(i18n.preparing, { filename }));
 
       try {
-        const response = await postJson(url);
+        const response = await postJsonWithBody(url, { text: combinedSourceText.value, align: selectedCombinedAlign });
         const blob = await response.blob();
         const objectUrl = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -1145,52 +1068,11 @@
         link.click();
         link.remove();
         URL.revokeObjectURL(objectUrl);
-        setStatus(statusText, formatMessage(i18n.downloaded, { filename }));
+        setStatus(combinedStatusText, formatMessage(i18n.downloaded, { filename }));
       } catch (error) {
-        setStatus(statusText, error.message, true);
+        setStatus(combinedStatusText, error.message, true);
       } finally {
-        setBusy(lineBreakButtons, false);
-      }
-    }
-
-    async function processEqualsText() {
-      setBusy(equalsButtons, true);
-      setStatus(equalsStatusText, i18n.processing);
-
-      try {
-        const response = await postJsonWithText("/line-break/equals", equalsSourceText.value);
-        const data = await response.json();
-        equalsResultText.textContent = data.result || "";
-        updateEqualsOutputMeta(data.result || "");
-        updateFieldActions();
-        setStatus(equalsStatusText, i18n.processed);
-      } catch (error) {
-        setStatus(equalsStatusText, error.message, true);
-      } finally {
-        setBusy(equalsButtons, false);
-      }
-    }
-
-    async function downloadEqualsFile(url, filename) {
-      setBusy(equalsButtons, true);
-      setStatus(equalsStatusText, formatMessage(i18n.preparing, { filename }));
-
-      try {
-        const response = await postJsonWithBody(url, { text: equalsSourceText.value, align: selectedEqualsAlign });
-        const blob = await response.blob();
-        const objectUrl = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = objectUrl;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        URL.revokeObjectURL(objectUrl);
-        setStatus(equalsStatusText, formatMessage(i18n.downloaded, { filename }));
-      } catch (error) {
-        setStatus(equalsStatusText, error.message, true);
-      } finally {
-        setBusy(equalsButtons, false);
+        setBusy(combinedButtons, false);
       }
     }
 
@@ -1231,12 +1113,13 @@
 
     function useLookupInInput() {
       const text = isRealOutputText(lookupResult) ? lookupResult.textContent : "";
-      sourceText.value = text;
-      updateInputMeta();
+      combinedSourceText.value = text;
+      updateCombinedInputMeta();
       updateFieldActions();
-      setStatus(statusText, text ? i18n.lookup_used : i18n.lookup_empty, !text);
+      setStatus(combinedStatusText, text ? i18n.lookup_used : i18n.lookup_empty, !text);
       if (text) {
         activateMainTab("line-break-panel");
+        activateLineBreakTab("combined-line-break-panel");
       }
     }
 
@@ -1249,10 +1132,6 @@
     criterionButtons.forEach((button) => {
       button.addEventListener("click", () => selectGeneralCriterion(button.dataset.criterion));
     });
-    sourceText.addEventListener("input", () => {
-      updateInputMeta();
-      updateFieldActions();
-    });
     lookupInput.addEventListener("input", updateFieldActions);
     generalSourceText.addEventListener("input", () => {
       updateGeneralInputMeta();
@@ -1263,33 +1142,21 @@
         processGeneralText();
       }
     });
-    equalsSourceText.addEventListener("input", () => {
-      updateEqualsInputMeta();
+    combinedSourceText.addEventListener("input", () => {
+      updateCombinedInputMeta();
       updateFieldActions();
     });
-    equalsAlignButtons.forEach((button) => {
-      button.addEventListener("click", () => selectEqualsAlign(button.dataset.align));
+    combinedAlignButtons.forEach((button) => {
+      button.addEventListener("click", () => selectCombinedAlign(button.dataset.align));
     });
-    document.getElementById("processBtn").addEventListener("click", processText);
-    document.getElementById("docxBtn").addEventListener("click", () => downloadFile("/line-break/export_docx", "output.docx"));
-    document.getElementById("pptxBtn").addEventListener("click", () => downloadFile("/line-break/export_ppt", "output.pptx"));
-    document.getElementById("xlsxBtn").addEventListener("click", () => downloadFile("/line-break/export_xlsx", "output.xlsx"));
     document.getElementById("lookupBtn").addEventListener("click", lookupVerse);
     document.getElementById("useLookupBtn").addEventListener("click", useLookupInInput);
     processGeneralBtn.addEventListener("click", processGeneralText);
-    document.getElementById("equalsProcessBtn").addEventListener("click", processEqualsText);
-    document.getElementById("equalsPptxBtn").addEventListener("click", () => downloadEqualsFile("/line-break/equals/export_ppt", "output.pptx"));
-    copyResultBtn.addEventListener("click", () => copyOutput(resultText));
+    document.getElementById("combinedProcessBtn").addEventListener("click", processCombinedText);
+    document.getElementById("combinedPptxBtn").addEventListener("click", () => downloadCombinedFile("/line-break/combined/export_ppt", "output.pptx"));
     copyLookupBtn.addEventListener("click", () => copyOutput(lookupResult));
     copyGeneralResultBtn.addEventListener("click", () => copyOutput(generalResultText));
-    copyEqualsResultBtn.addEventListener("click", () => copyOutput(equalsResultText));
-    eraseSourceBtn.addEventListener("click", () => {
-      eraseField(sourceText, {
-        afterErase: updateInputMeta,
-        focus: true
-      });
-      clearOutput(resultText, updateOutputMeta);
-    });
+    copyCombinedResultBtn.addEventListener("click", () => copyOutput(combinedResultText));
     eraseLookupInputBtn.addEventListener("click", () => {
       eraseField(lookupInput, {
         focus: true
@@ -1304,24 +1171,22 @@
       clearOutput(generalResultText, updateGeneralOutputMeta);
       setStatus(generalStatusText, selectedGeneralCriterion ? i18n.general_input_required : i18n.criterion_required, true);
     });
-    eraseEqualsSourceBtn.addEventListener("click", () => {
-      eraseField(equalsSourceText, {
-        afterErase: updateEqualsInputMeta,
+    eraseCombinedSourceBtn.addEventListener("click", () => {
+      eraseField(combinedSourceText, {
+        afterErase: updateCombinedInputMeta,
         focus: true
       });
-      clearOutput(equalsResultText, updateEqualsOutputMeta);
+      clearOutput(combinedResultText, updateCombinedOutputMeta);
     });
 
-    updateInputMeta();
-    updateOutputMeta("");
     updateLookupMeta("");
     updateGeneralInputMeta();
     updateGeneralOutputMeta("");
-    updateEqualsInputMeta();
-    updateEqualsOutputMeta("");
+    updateCombinedInputMeta();
+    updateCombinedOutputMeta("");
     updateFieldActions();
     activateMainTab("line-break-panel");
-    activateLineBreakTab("bible-line-break-panel");
+    activateLineBreakTab("combined-line-break-panel");
   </script>
 </body>
 </html>
