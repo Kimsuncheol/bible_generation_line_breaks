@@ -27,6 +27,10 @@ def apply_equals_line_break(text: str) -> str:
 BIBLE_LINE_PATTERN = re.compile(r'^([가-힣]+\d+:\d+(?:-\d+)?)[ \t]+(.+)$')
 REF_PARTS_PATTERN = re.compile(r'^([가-힣]+)(\d+):(\d+)')
 CITATION_PATTERN = re.compile(r'\(([^()]+)\)\s*$')
+# A plain text starts with an ordinal marker ('첫째', '둘째', ...) or a
+# numbered-list marker ('1.', '1)'); a bare '=' elsewhere in a line is not
+# enough on its own (e.g. a stray '=' in a header shouldn't be misread).
+PLAIN_TEXT_PATTERN = re.compile(r'^([가-힣]+째|\d+[.)])')
 
 def _group_citation_key(group: list[tuple[str, str]]) -> str | None:
     # Mirrors how an outline line cites a range, e.g. a 막16:16 + 막16:17
@@ -48,8 +52,9 @@ def _format_bible_group(group: list[tuple[str, str]]) -> list[str]:
 
 def apply_combined_line_break(text: str) -> list[tuple[str, list[str]]]:
     # Parses the whole document into ordered 'bible' verse groups (consecutive
-    # verse lines separated by at most one blank line) and '=' outline lines;
-    # any other non-blank line (e.g. a '♡본론' section header) is dropped.
+    # verse lines separated by at most one blank line) and plain-text outline
+    # lines (start with an ordinal/list marker); any other non-blank line
+    # (e.g. a '♡본론' section header) is dropped.
     # Each returned entry's parts list holds one string per resulting slide;
     # callers that want flat text should join a bible entry's parts with a
     # single blank line and join entries themselves with a wider gap.
@@ -83,7 +88,7 @@ def apply_combined_line_break(text: str) -> list[tuple[str, list[str]]]:
 
         flush_group()
         blank_run = 0
-        if '=' in stripped:
+        if PLAIN_TEXT_PATTERN.match(stripped):
             raw_items.append(('outline', stripped))
         # else: a header/noise line (e.g. '♡본론'), dropped.
 

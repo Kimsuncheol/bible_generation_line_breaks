@@ -720,6 +720,25 @@ class TestApplyCombinedLineBreak:
         entries = apply_combined_line_break('첫째:생활가난때=생활부요믿어야(고후8:9)')
         assert entries == [('equals', ['첫째:생활가난때=\n생활부요믿어야(고후8:9)'])]
 
+    def test_numbered_dot_marker_is_plain_text(self):
+        entries = apply_combined_line_break('1.생활가난때=생활부요믿어야(고후8:9)')
+        assert entries == [('equals', ['1.생활가난때=\n생활부요믿어야(고후8:9)'])]
+
+    def test_numbered_paren_marker_is_plain_text(self):
+        entries = apply_combined_line_break('1)생활가난때=생활부요믿어야(고후8:9)')
+        assert entries == [('equals', ['1)생활가난때=\n생활부요믿어야(고후8:9)'])]
+
+    def test_line_with_equals_but_no_ordinal_marker_is_dropped(self):
+        # A bare '=' is no longer sufficient on its own; only lines that
+        # start with an ordinal/list marker count as plain text.
+        entries = apply_combined_line_break('참고: A=B 공식이 적용됨')
+        assert entries == []
+
+    def test_header_with_stray_equals_is_still_dropped(self):
+        text = '♡본론 (수정=완료)\n첫째:생활가난때=생활부요믿어야(고후8:9)'
+        entries = apply_combined_line_break(text)
+        assert entries == [('equals', ['첫째:생활가난때=\n생활부요믿어야(고후8:9)'])]
+
 
 # ── POST /line-break/combined ──────────────────────────────────────────────────
 

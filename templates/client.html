@@ -4,6 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ _("Line Break Test Client") }}</title>
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem("theme");
+        var theme = stored === "light" || stored === "dark"
+          ? stored
+          : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (error) {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
   <style>
     :root {
       color-scheme: light;
@@ -17,6 +30,50 @@
       --line: #d8c8b5;
       --danger: #a63232;
       --shadow: 0 20px 50px rgba(29, 36, 51, 0.12);
+      --border: rgba(216, 200, 181, 0.85);
+      --border-strong: rgba(216, 200, 181, 0.95);
+      --on-accent: #fff;
+      --surface-veil: rgba(255, 255, 255, 0.72);
+      --surface-soft: rgba(255, 255, 255, 0.42);
+      --surface-soft-2: rgba(255, 255, 255, 0.38);
+      --surface-soft-3: rgba(255, 255, 255, 0.78);
+      --surface-tint: rgba(255, 255, 255, 0.2);
+      --surface-input: rgba(255, 255, 255, 0.9);
+      --surface-solid: #fff;
+      --surface-shadow-sm: rgba(29, 36, 51, 0.08);
+      --hero-overlay: rgba(255, 255, 255, 0.5);
+      --bg-grad-1: #efdfca;
+      --bg-grad-2: #f7f0e4;
+      --bg-grad-3: #edd8be;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --paper: #14171f;
+      --panel: rgba(28, 32, 42, 0.92);
+      --ink: #e8e6df;
+      --muted: #9aa0ab;
+      --accent: #2dd4bf;
+      --accent-strong: #5eead4;
+      --accent-soft: rgba(45, 212, 191, 0.14);
+      --line: #333a48;
+      --danger: #f2777b;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      --border: rgba(255, 255, 255, 0.12);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --on-accent: #06201d;
+      --surface-veil: rgba(255, 255, 255, 0.05);
+      --surface-soft: rgba(255, 255, 255, 0.04);
+      --surface-soft-2: rgba(255, 255, 255, 0.035);
+      --surface-soft-3: rgba(255, 255, 255, 0.08);
+      --surface-tint: rgba(255, 255, 255, 0.03);
+      --surface-input: rgba(255, 255, 255, 0.06);
+      --surface-solid: #232733;
+      --surface-shadow-sm: rgba(0, 0, 0, 0.35);
+      --hero-overlay: rgba(255, 255, 255, 0.04);
+      --bg-grad-1: #0b0d12;
+      --bg-grad-2: #12141b;
+      --bg-grad-3: #191c26;
     }
 
     * {
@@ -29,16 +86,17 @@
       font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, 0.72), transparent 25%),
-        linear-gradient(135deg, #efdfca 0%, #f7f0e4 52%, #edd8be 100%);
+        radial-gradient(circle at top left, var(--surface-veil), transparent 25%),
+        linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 52%, var(--bg-grad-3) 100%);
       padding: 32px 20px;
+      transition: background 160ms ease, color 160ms ease;
     }
 
     .shell {
       max-width: 1180px;
       margin: 0 auto;
       background: var(--panel);
-      border: 1px solid rgba(216, 200, 181, 0.85);
+      border: 1px solid var(--border);
       border-radius: 28px;
       box-shadow: var(--shadow);
       overflow: hidden;
@@ -47,10 +105,10 @@
 
     .hero {
       padding: 32px;
-      border-bottom: 1px solid rgba(216, 200, 181, 0.85);
+      border-bottom: 1px solid var(--border);
       background:
-        linear-gradient(120deg, rgba(15, 118, 110, 0.12), transparent 54%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent);
+        linear-gradient(120deg, var(--accent-soft), transparent 54%),
+        linear-gradient(180deg, var(--hero-overlay), transparent);
     }
 
     .hero-top {
@@ -75,11 +133,17 @@
       line-height: 1.6;
     }
 
+    .hero-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
     .language-switch {
       display: flex;
       align-items: center;
       gap: 6px;
-      flex: 0 0 auto;
       font: 600 0.78rem/1 "Avenir Next", "Segoe UI", sans-serif;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -88,21 +152,55 @@
     .language-switch a {
       color: var(--accent-strong);
       text-decoration: none;
-      border: 1px solid rgba(216, 200, 181, 0.95);
+      border: 1px solid var(--border-strong);
       border-radius: 4px;
-      background: rgba(255, 255, 255, 0.72);
+      background: var(--surface-veil);
       padding: 8px 10px;
     }
 
     .language-switch a[aria-current="true"] {
       background: var(--accent);
       border-color: var(--accent);
-      color: #fff;
+      color: var(--on-accent);
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      background: var(--surface-veil);
+      color: var(--accent-strong);
+    }
+
+    .theme-toggle svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .theme-toggle .icon-moon {
+      display: block;
+    }
+
+    .theme-toggle .icon-sun {
+      display: none;
+    }
+
+    :root[data-theme="dark"] .theme-toggle .icon-moon {
+      display: none;
+    }
+
+    :root[data-theme="dark"] .theme-toggle .icon-sun {
+      display: block;
     }
 
     .section {
       padding: 28px 32px 32px;
-      border-bottom: 1px solid rgba(216, 200, 181, 0.85);
+      border-bottom: 1px solid var(--border);
     }
 
     .section:last-child {
@@ -113,15 +211,15 @@
       display: flex;
       gap: 10px;
       padding: 22px 32px 0;
-      border-bottom: 1px solid rgba(216, 200, 181, 0.85);
-      background: rgba(255, 255, 255, 0.2);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-tint);
     }
 
     .tab-button {
-      border: 1px solid rgba(216, 200, 181, 0.95);
+      border: 1px solid var(--border-strong);
       border-bottom: 0;
       border-radius: 18px 18px 0 0;
-      background: rgba(255, 255, 255, 0.42);
+      background: var(--surface-soft);
       color: var(--muted);
       padding: 14px 18px;
     }
@@ -144,21 +242,21 @@
       display: flex;
       gap: 8px;
       margin-bottom: 20px;
-      border-bottom: 1px solid rgba(216, 200, 181, 0.85);
+      border-bottom: 1px solid var(--border);
     }
 
     .subtab-button {
-      border: 1px solid rgba(216, 200, 181, 0.95);
+      border: 1px solid var(--border-strong);
       border-bottom: 0;
       border-radius: 10px 10px 0 0;
-      background: rgba(255, 255, 255, 0.38);
+      background: var(--surface-soft-2);
       color: var(--muted);
       padding: 10px 14px;
       font-size: 0.9rem;
     }
 
     .subtab-button[aria-selected="true"] {
-      background: rgba(255, 255, 255, 0.78);
+      background: var(--surface-soft-3);
       color: var(--accent-strong);
       box-shadow: inset 0 3px 0 rgba(15, 118, 110, 0.45);
     }
@@ -210,7 +308,7 @@
       padding: 22px;
       border: 1px solid var(--line);
       border-radius: 20px;
-      background: rgba(255, 255, 255, 0.72);
+      background: var(--surface-veil);
     }
 
     .panel-title {
@@ -240,7 +338,7 @@
       width: 100%;
       border: 1px solid var(--line);
       border-radius: 16px;
-      background: rgba(255, 255, 255, 0.9);
+      background: var(--surface-input);
       color: var(--ink);
       font: 15px/1.7 "SFMono-Regular", "Menlo", "Consolas", monospace;
     }
@@ -302,14 +400,14 @@
       width: 34px;
       height: 30px;
       padding: 0;
-      border: 1px solid rgba(216, 200, 181, 0.95);
+      border: 1px solid var(--border-strong);
       border-radius: 4px;
-      background: #fff;
-      box-shadow: 0 4px 10px rgba(29, 36, 51, 0.08);
+      background: var(--surface-solid);
+      box-shadow: 0 4px 10px var(--surface-shadow-sm);
     }
 
     .field-icon-button:hover {
-      background: #fff;
+      background: var(--surface-solid);
     }
 
     .copy-output-button {
@@ -348,9 +446,9 @@
       width: 44px;
       height: 40px;
       padding: 0;
-      border: 1px solid rgba(216, 200, 181, 0.95);
+      border: 1px solid var(--border-strong);
       border-radius: 6px;
-      background: rgba(255, 255, 255, 0.78);
+      background: var(--surface-soft-3);
       color: var(--accent-strong);
       font: 700 1.05rem/1 "Avenir Next", "Segoe UI", sans-serif;
     }
@@ -364,7 +462,7 @@
     .criterion-button[aria-pressed="true"] {
       background: var(--accent);
       border-color: var(--accent);
-      color: #fff;
+      color: var(--on-accent);
     }
 
     button {
@@ -389,7 +487,7 @@
 
     .primary {
       background: var(--accent);
-      color: #fff;
+      color: var(--on-accent);
     }
 
     .primary:hover {
@@ -452,10 +550,21 @@
     <section class="hero">
       <div class="hero-top">
         <h1>{{ _("Line Break Test Client") }}</h1>
-        <nav class="language-switch" aria-label="{{ _('Language') }}">
-          <a href="/client?lang=en" aria-current="{{ 'true' if locale == 'en' else 'false' }}">EN</a>
-          <a href="/client?lang=ko" aria-current="{{ 'true' if locale == 'ko' else 'false' }}">한국어</a>
-        </nav>
+        <div class="hero-controls">
+          <nav class="language-switch" aria-label="{{ _('Language') }}">
+            <a href="/client?lang=en" aria-current="{{ 'true' if locale == 'en' else 'false' }}">EN</a>
+            <a href="/client?lang=ko" aria-current="{{ 'true' if locale == 'ko' else 'false' }}">한국어</a>
+          </nav>
+          <button class="theme-toggle" id="themeToggleBtn" type="button" aria-label="{{ _('Toggle appearance') }}" title="{{ _('Toggle appearance') }}">
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+            </svg>
+          </button>
+        </div>
       </div>
       <p>
         {{ _("Generate Korean Bible text from multiple references, move the result into the line-break workflow, then process and export it.") }}
@@ -714,6 +823,8 @@
     const generalResultActions = document.getElementById("generalResultActions");
     const combinedSourceActions = document.getElementById("combinedSourceActions");
     const combinedResultActions = document.getElementById("combinedResultActions");
+
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
 
     const lookupButtons = Array.from(document.querySelectorAll("#lookupBtn, #useLookupBtn"));
     const combinedButtons = Array.from(document.querySelectorAll("#combinedProcessBtn, #combinedPptxBtn"));
@@ -987,6 +1098,16 @@
       setStatus(generalStatusText, generalSourceText.value.trim() ? i18n.ready : i18n.general_input_required, !generalSourceText.value.trim());
     }
 
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      themeToggleBtn.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+      try {
+        localStorage.setItem("theme", theme);
+      } catch (error) {
+        // ignore storage errors (e.g. private browsing)
+      }
+    }
+
     function selectCombinedAlign(align) {
       selectedCombinedAlign = align;
       combinedAlignButtons.forEach((button) => {
@@ -1148,6 +1269,11 @@
     });
     combinedAlignButtons.forEach((button) => {
       button.addEventListener("click", () => selectCombinedAlign(button.dataset.align));
+    });
+    themeToggleBtn.setAttribute("aria-pressed", document.documentElement.getAttribute("data-theme") === "dark" ? "true" : "false");
+    themeToggleBtn.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+      applyTheme(current === "dark" ? "light" : "dark");
     });
     document.getElementById("lookupBtn").addEventListener("click", lookupVerse);
     document.getElementById("useLookupBtn").addEventListener("click", useLookupInInput);
