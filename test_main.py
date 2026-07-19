@@ -11,7 +11,12 @@ from docx import Document
 import openpyxl
 from main import app
 from utils.bible_api import BibleAPIError, generate_bible_text, normalize_korean_reference, parse_reference_lines
-from utils.text_processing import apply_combined_line_break, apply_equals_line_break, inspect_line_breaks
+from utils.text_processing import (
+    apply_combined_line_break,
+    apply_equals_line_break,
+    inspect_line_breaks,
+    parse_bible_reference,
+)
 
 client = TestClient(app)
 
@@ -779,6 +784,43 @@ SERMON_TEXT = (
 
 
 class TestLineBreakCombined:
+    def test_reference_only_line_consumes_following_verse_text(self):
+        text = '마16:16\n주는 그리스도시요 살아 계신 하나님의 아들이시니이다'
+        assert apply_combined_line_break(text) == [
+            ('bible', ['마16:16\n주는 그리스도시요 살아 계신 하나님의 아들이시니이다'])
+        ]
+
+    def test_reference_only_line_is_preserved_at_end_of_input(self):
+        assert apply_combined_line_break('마1:1') == [('bible', ['마1:1'])]
+
+    def test_book_and_chapter_must_exist_in_catalog(self):
+        assert apply_combined_line_break('회의1:2 다음 주 일정을 정합니다') == []
+        assert apply_combined_line_break('막99:1 존재하지 않는 장입니다') == []
+
+    def test_full_book_name_and_spacing_are_normalized(self):
+        text = '마태복음 16장 16절 주는 그리스도시요'
+        assert apply_combined_line_break(text) == [
+            ('bible', ['마16:16\n주는 그리스도시요'])
+        ]
+
+    def test_catalog_key_variants_use_canonical_abbreviations(self):
+        assert parse_bible_reference('눅2:1')['canonical_reference'] == '눅2:1'
+        assert parse_bible_reference('약5:1')['canonical_reference'] == '약5:1'
+        assert parse_bible_reference('합3:1')['canonical_reference'] == '합3:1'
+
+    def test_range_separator_is_normalized_for_citation_pairing(self):
+        text = (
+            '첫째:믿음=고백해야(마태복음 16:16–17)\n'
+            '마16:16 주는 그리스도시요\n'
+            '마16:17 예수께서 대답하여 이르시되'
+        )
+        result = apply_combined_line_break(text)
+        assert result[0][0] == 'equals'
+        assert result[1] == (
+            'bible',
+            ['마16:16\n주는 그리스도시요', '마16:17\n예수께서 대답하여 이르시되'],
+        )
+
     def test_mixed_input(self):
         text = (
             '첫째:날마다=그리스도말씀들어야(롬10:17)\n'
