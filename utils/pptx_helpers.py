@@ -1,3 +1,5 @@
+from datetime import date
+
 from lxml import etree
 from pptx.oxml.ns import qn
 
@@ -11,3 +13,8 @@ def set_east_asian_font(run, typeface):
     if ea is None:
         ea = etree.SubElement(rPr, qn("a:ea"))
     ea.set("typeface", typeface)
+
+
+def pptx_download_filename(today=None):
+    """Return the date-based filename used for PPTX downloads."""
+    return f"{today or date.today():%Y-%m-%d}.pptx"

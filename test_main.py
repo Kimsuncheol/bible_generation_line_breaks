@@ -1,5 +1,6 @@
 import io
 import json
+from datetime import date
 from unittest.mock import patch
 from urllib.error import URLError
 
@@ -448,7 +449,7 @@ class TestExportPPT:
 
     def test_content_disposition(self):
         response = client.post('/line-break/export_ppt', json={'text': '창1:1 태초에 하나님이'})
-        assert 'output.pptx' in response.headers['content-disposition']
+        assert f'{date.today():%Y-%m-%d}.pptx' in response.headers['content-disposition']
 
     def test_slide_text_content(self):
         response = client.post('/line-break/export_ppt', json={'text': '창1:1 태초에 하나님이 천지를 창조하시니라'})
@@ -520,7 +521,7 @@ class TestExportPPTEquals:
 
     def test_content_disposition(self):
         response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})
-        assert 'output.pptx' in response.headers['content-disposition']
+        assert f'{date.today():%Y-%m-%d}.pptx' in response.headers['content-disposition']
 
     def test_slide_text_content(self):
         response = client.post('/line-break/equals/export_ppt', json={'text': '첫째:생활가난때=생활부요믿어야(고후8:9)'})

@@ -4,7 +4,7 @@ from fastapi.responses import StreamingResponse
 from pptx import Presentation
 from pptx.util import Inches
 from schemas.line_break import LineBreakRequest
-from utils.pptx_helpers import set_east_asian_font
+from utils.pptx_helpers import pptx_download_filename, set_east_asian_font
 from utils.slide_styles import BIBLE_STYLE, SLIDE_HEIGHT, SLIDE_WIDTH
 from utils.text_processing import apply_line_break, inspect_line_breaks
 
@@ -54,5 +54,5 @@ def export_ppt(request: LineBreakRequest):
     return StreamingResponse(
         buf,
         media_type='application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        headers={'Content-Disposition': 'attachment; filename="output.pptx"'},
+        headers={'Content-Disposition': f'attachment; filename="{pptx_download_filename()}"'},
     )

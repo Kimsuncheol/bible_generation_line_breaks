@@ -5,7 +5,7 @@ from pptx import Presentation
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Inches
 from schemas.line_break import LineBreakEqualsExportRequest
-from utils.pptx_helpers import set_east_asian_font
+from utils.pptx_helpers import pptx_download_filename, set_east_asian_font
 from utils.slide_styles import BIBLE_STYLE, EQUALS_STYLE, SLIDE_HEIGHT, SLIDE_WIDTH
 from utils.text_processing import apply_combined_line_break
 
@@ -68,5 +68,5 @@ def export_ppt_combined(request: LineBreakEqualsExportRequest):
     return StreamingResponse(
         buf,
         media_type='application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        headers={'Content-Disposition': 'attachment; filename="output.pptx"'},
+        headers={'Content-Disposition': f'attachment; filename="{pptx_download_filename()}"'},
     )

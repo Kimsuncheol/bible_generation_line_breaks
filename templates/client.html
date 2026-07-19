@@ -1197,6 +1197,14 @@
       }
     }
 
+    function pptxFilenameForToday() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}.pptx`;
+    }
+
     async function lookupVerse() {
       const text = lookupInput.value.trim();
       if (!text) {
@@ -1279,7 +1287,7 @@
     document.getElementById("useLookupBtn").addEventListener("click", useLookupInInput);
     processGeneralBtn.addEventListener("click", processGeneralText);
     document.getElementById("combinedProcessBtn").addEventListener("click", processCombinedText);
-    document.getElementById("combinedPptxBtn").addEventListener("click", () => downloadCombinedFile("/line-break/combined/export_ppt", "output.pptx"));
+    document.getElementById("combinedPptxBtn").addEventListener("click", () => downloadCombinedFile("/line-break/combined/export_ppt", pptxFilenameForToday()));
     copyLookupBtn.addEventListener("click", () => copyOutput(lookupResult));
     copyGeneralResultBtn.addEventListener("click", () => copyOutput(generalResultText));
     copyCombinedResultBtn.addEventListener("click", () => copyOutput(combinedResultText));
