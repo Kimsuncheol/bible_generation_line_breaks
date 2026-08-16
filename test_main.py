@@ -406,7 +406,7 @@ class TestApplyEqualsLineBreak:
         )
         assert apply_equals_line_break(text) == (
             '첫째:생활가난때=\n생활부요믿어야(고후8:9)\n\n'
-            '둘째:귀신역사때=\n귀신축귀믿어야(막16:16~17)'
+            '둘째:귀신역사때=\n귀신축귀믿어야(막16:16-17)'
         )
 
     def test_multiple_equals_signs_each_break(self):
@@ -421,6 +421,18 @@ class TestApplyEqualsLineBreak:
 
     def test_line_without_equals_is_kept_as_is(self):
         assert apply_equals_line_break('그냥 문장입니다') == '그냥 문장입니다'
+
+    def test_tilde_between_numbers_in_citation_becomes_dash(self):
+        assert apply_equals_line_break('가나다=라마바(요1:1~2)') == '가나다=\n라마바(요1:1-2)'
+
+    def test_long_content_breaks_before_citation(self):
+        text = '첫째:아주길게이어지는내용입니다=이것도아주아주아주길게이어지는답변내용입니다(고후8:9)'
+        result = apply_equals_line_break(text)
+        assert '이것도아주아주아주길게이어지는답변내용입니다\n(고후8:9)' in result
+
+    def test_short_content_does_not_break_before_citation(self):
+        text = '첫째:생활가난때=생활부요믿어야(고후8:9)'
+        assert '믿어야\n(고후8:9)' not in apply_equals_line_break(text)
 
 
 # ── POST /line-break/equals ────────────────────────────────────────────────────
@@ -440,7 +452,7 @@ class TestLineBreakEquals:
         assert response.status_code == 200
         result = response.json()['result']
         assert '첫째:생활가난때=\n생활부요믿어야(고후8:9)' in result
-        assert '둘째:귀신역사때=\n귀신축귀믿어야(막16:16~17)' in result
+        assert '둘째:귀신역사때=\n귀신축귀믿어야(막16:16-17)' in result
         assert result.count('\n\n') == 1
 
 
@@ -691,7 +703,7 @@ class TestApplyCombinedLineBreak:
         )
         entries = apply_combined_line_break(text)
         assert entries == [
-            ('equals', ['둘째:귀신역사때=\n귀신축귀믿어야(막16:16~17)']),
+            ('equals', ['둘째:귀신역사때=\n귀신축귀믿어야(막16:16-17)']),
             ('bible', [
                 '막16:16\n믿고 세례를 받는 사람은 구원을 얻을 것이요',
                 '막16:17\n믿는 자들에게는 이런 표적이 따르리니',
@@ -846,12 +858,12 @@ class TestLineBreakCombined:
             '고후8:9\n우리 주 예수 그리스도의 은혜를 너희가 알거니와 부요하신 이로서 너희를 위하여 가난하게 되심은 그의 가난함으로 말미암아 너희를 부요하게 하려 하심이라'
         ) in result
         assert (
-            '둘째:귀신역사때=\n귀신축귀믿어야(막16:16~17)\n\n\n'
+            '둘째:귀신역사때=\n귀신축귀믿어야(막16:16-17)\n\n\n'
             '막16:16\n믿고 세례를 받는 사람은 구원을 얻을 것이요 믿지 않는 사람은 정죄를 받으리라\n\n'
             '막16:17\n믿는 자들에게는 이런 표적이 따르리니 곧 그들이 내 이름으로 귀신을 쫓아내며 새 방언을 말하며'
         ) in result
         assert (
-            '둘째:날마다=\n성령님으로충만해야(엡5:16~18)\n\n\n'
+            '둘째:날마다=\n성령님으로충만해야(엡5:16-18)\n\n\n'
             '엡5:16\n세월을 아끼라 때가 악하니라\n\n'
             '엡5:17\n그러므로 어리석은 자가 되지 말고 오직 주의 뜻이 무엇인가 이해하라\n\n'
             '엡5:18\n술 취하지 말라 이는 방탕한 것이니 오직 성령으로 충만함을 받으라'
