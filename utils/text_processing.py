@@ -21,11 +21,41 @@ def apply_line_break(text: str) -> str:
     result = re.sub(r'(^|\n)([가-힣]+\d+:\d+(?:-\d+)?)[ \t]+', r'\1\2\n', result)
     return result
 
+_CITATION_TILDE_PATTERN = re.compile(r'(?<=\d)~(?=\d)')
+
+
+def _normalize_citation_dashes(text: str) -> str:
+    # A verse range cited in parentheses, e.g. '(막16:16~17)', reads better
+    # with a dash than a tilde.
+    return re.sub(
+        r'\(([^()]*)\)',
+        lambda m: '(' + _CITATION_TILDE_PATTERN.sub('-', m.group(1)) + ')',
+        text,
+    )
+
+
+# Outline/answer lines end with a '(...)' citation; past this many characters
+# the citation is pushed to its own line so it doesn't crowd the slide.
+_EQUALS_CONTENT_MAX_LENGTH = 20
+_TRAILING_CITATION_PATTERN = re.compile(r'^(.*\S)(\([^()]*\))$')
+
+
+def format_equals_line(line: str) -> str:
+    # Break after every '=' since it marks an outline/answer boundary; if the
+    # final segment (content + trailing citation) is too long, also break
+    # between the content and its citation.
+    line = _normalize_citation_dashes(line.strip())
+    *heads, tail = line.split('=')
+    tail_match = _TRAILING_CITATION_PATTERN.match(tail)
+    if tail_match and len(tail) > _EQUALS_CONTENT_MAX_LENGTH:
+        tail = f'{tail_match.group(1)}\n{tail_match.group(2)}'
+    return '=\n'.join([*heads, tail])
+
+
 def apply_equals_line_break(text: str) -> str:
-    # Each non-blank source line becomes its own block (slide); within a
-    # block, break after every '=' since it marks the outline/answer boundary.
+    # Each non-blank source line becomes its own block (slide).
     _, _, lines = inspect_line_breaks(text)
-    blocks = [re.sub(r'=', '=\n', line.strip()) for line in lines if line.strip()]
+    blocks = [format_equals_line(line) for line in lines if line.strip()]
     return '\n\n'.join(blocks)
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -232,7 +262,7 @@ def apply_combined_line_break(text: str) -> list[tuple[str, list[str]]]:
     result: list[tuple[str, list[str]]] = []
     for item in raw_items:
         if item[0] == 'outline':
-            result.append(('equals', [re.sub(r'=', '=\n', item[1])]))
+            result.append(('equals', [format_equals_line(item[1])]))
             matched = outline_pairs.get(id(item))
             if matched:
                 result.append(('bible', _format_bible_group(matched[1])))
